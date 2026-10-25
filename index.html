@@ -36,7 +36,7 @@
     .note { color:var(--muted); font-size:0.78rem; line-height:1.4; }
     #notice { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#102018; border:1px solid var(--line); padding:10px 14px; border-radius:12px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:9999; max-width:90vw; }
     #notice.on { opacity:1; }
-    dialog, #dlg { position:fixed; inset:0; margin:auto; border:1px solid var(--line); border-radius:14px; background:var(--panel); color:var(--text); padding:16px; width:min(420px,92vw); z-index:10000; }
+    #dlg { position:fixed; inset:0; margin:auto; border:1px solid var(--line); border-radius:14px; background:var(--panel); color:var(--text); padding:16px; width:min(420px,92vw); z-index:10000; }
     #dlg[hidden] { display:none !important; }
     #dlg label { display:block; margin:8px 0 4px; font-size:0.85rem; color:var(--muted); }
     #dlg select { width:100%; padding:8px; border-radius:8px; border:1px solid var(--line); background:#0f1714; color:var(--text); }
@@ -95,7 +95,13 @@
     </div>
   </div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="stations-shell-1.js"></script>
+  <script src="stations-shell-2.js"></script>
+  <script src="stations-shell-3.js"></script>
   <script src="stations-shell.js"></script>
+  <script src="stations-total-1.js"></script>
+  <script src="stations-total-2.js"></script>
+  <script src="stations-total-3.js"></script>
   <script src="stations-data.js"></script>
   <script src="stations-mka.js"></script>
   <script src="stations-ola.js"></script>
