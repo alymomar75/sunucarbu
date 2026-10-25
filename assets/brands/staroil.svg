@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="30" fill="#147a78"/>
-  <text x="32" y="38" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="14" fill="#fff">STAR</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 90" role="img">
+  <text x="8" y="58" font-family="Arial Black, Helvetica, Arial, sans-serif" font-weight="900" font-size="52" fill="#111">star</text>
+  <circle cx="168" cy="42" r="26" fill="#2B98D4"/>
+  <path d="M155 55 C162 30, 185 18, 198 14" stroke="#FFEC00" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <polygon points="198,8 203,18 214,18 205,25 208,36 198,29 188,36 191,25 182,18 193,18" fill="#FFEC00"/>
 </svg>
