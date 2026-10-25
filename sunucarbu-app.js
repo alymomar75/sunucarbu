@@ -107,19 +107,7 @@
 
   function isReportValid(report) {
     if (!report || !report.timestamp) return false;
-    if (Date.now() - report.timestamp > 24 * 3600 * 1000) return false;
-    const parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Africa/Dakar", year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", hour12: false
-    }).formatToParts(new Date(report.timestamp));
-    const get = (t) => +parts.find((p) => p.type === t).value;
-    let y = get("year"), m = get("month"), d = get("day");
-    const h = get("hour");
-    if (h >= 19) {
-      const next = new Date(Date.UTC(y, m - 1, d + 1));
-      y = next.getUTCFullYear(); m = next.getUTCMonth() + 1; d = next.getUTCDate();
-    }
-    return Date.now() < Date.UTC(y, m - 1, d, 19, 0, 0);
+    return (Date.now() - report.timestamp) < 48 * 3600 * 1000;
   }
 
   function getLocal() {
@@ -147,8 +135,9 @@
     const img = st.logo
       ? `<img src="${st.logo}" alt="" draggable="false" onerror="this.style.display='none';this.parentNode.textContent='${st.initials}'">`
       : `<span style="font-size:8px;font-weight:800;color:${st.color}">${st.initials}</span>`;
-    const dot = (status === "available" || status === "shortage")
-      ? `<span class="sd ${status === "shortage" ? "no" : "ok"}"></span>` : "";
+    const dot = status === "shortage"
+      ? `<span class="sd no"></span>`
+      : (status === "available" ? `<span class="sd ok"></span>` : "");
     return `<span class="marker-wrap"><span class="brand" style="--c:${st.color}">${img}</span>${dot}</span>`;
   }
 
@@ -162,7 +151,7 @@
         iconSize: [30, 30],
         iconAnchor: [15, 15]
       }),
-      title: stationLabel(s) + (status === "shortage" ? " · Rupture" : status === "available" ? " · Disponible" : "")
+      title: stationLabel(s) + (status === "shortage" ? " · Pénurie signalée" : status === "available" ? " · Disponible (signalé)" : " · Disponible")
     });
     const src = s.sourceUrl
       ? `<br><a href="${s.sourceUrl}" target="_blank" rel="noopener">Source ↗</a>`
@@ -201,8 +190,8 @@
     if (r) {
       const t = new Date(r.timestamp).toLocaleString("fr-FR", { timeZone: "Africa/Dakar" });
       info += r.availability === "shortage"
-        ? ` · Rupture signalée (${t})`
-        : ` · Disponible (${t})`;
+        ? ` · Pénurie signalée (${t})`
+        : ` · Disponible signalé (${t})`;
     }
     $("selInfo").textContent = info;
     renderList();
@@ -240,8 +229,8 @@
       const row = document.createElement("button");
       row.type = "button";
       row.className = "row" + (selected && selected.key === s.key ? " on" : "");
-      const dot = status === "available" ? '<span class="dot ok"></span>'
-        : status === "shortage" ? '<span class="dot no"></span>' : "";
+      const dot = status === "shortage" ? '<span class="dot no"></span>'
+        : status === "available" ? '<span class="dot ok"></span>' : "";
       let meta = stationBrand(s);
       if (km != null) {
         meta += " · " + formatDistance(km) + " · ~" + formatEta(estimateMinutes(km));
@@ -348,7 +337,7 @@
     const countEl = $("count");
     if (countEl) countEl.textContent = "(" + stations.length + ")";
     const note = $("sourceNote");
-    if (note) note.textContent = stations.length + " stations référencées (Shell, TotalEnergies, OLA, ELTON, Star Oil, API, Touba Oil, MKA, SGF et autres). Emplacements à vérifier.";
+    if (note) note.textContent = stations.length + " stations · par défaut disponibles · pastille rouge = pénurie signalée.";
   }
 
   async function fetchShared() {
@@ -406,7 +395,7 @@
   };
   $("btnReport").onclick = () => {
     if (!selected) return;
-    $("dlgDesc").textContent = stationLabel(selected) + " · observation valable jusqu'à 19h (Dakar), non vérifiée.";
+    $("dlgDesc").textContent = stationLabel(selected) + " · signalement libre, visible par tous (non vérifié officiellement).";
     $("dlg").hidden = false;
   };
   $("btnCancel").onclick = () => { $("dlg").hidden = true; };
