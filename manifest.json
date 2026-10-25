@@ -1,11 +1,11 @@
 {
   "name": "SunuCarbu",
   "short_name": "SunuCarbu",
-  "description": "Stations-service du Sénégal et disponibilité",
+  "description": "Stations-service du Sénégal — énergie, carburant, service",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "theme_color": "#ffffff",
   "icons": [
     {
