@@ -11,16 +11,12 @@
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
   <title>SunuCarbu — Stations-service Sénégal</title>
-  <meta name="description" content="Carte des stations-service du Sénégal avec signalement de disponibilité et prix officiels.">
+  <meta name="description" content="Carte des stations-service du Sénégal : disponibilité, pénuries signalées et prix officiels.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     :root {
-      --bg: #0f1714;
-      --panel: #16211c;
-      --line: rgba(255,255,255,0.09);
-      --text: #e8f2ec;
-      --muted: #9bb5a8;
-      --accent: #1f8f56;
+      --bg: #0f1714; --panel: #16211c; --line: rgba(255,255,255,0.09);
+      --text: #e8f2ec; --muted: #9bb5a8; --accent: #1f8f56;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
@@ -28,187 +24,92 @@
     html, body { height: 100%; margin: 0; }
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       padding: var(--safe-top) 0 var(--safe-bottom);
     }
-
-    /* Header compact sombre */
     header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 8px 12px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--line);
-      min-height: 44px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 12px; background: var(--panel); border-bottom: 1px solid var(--line); min-height: 44px;
     }
-    header .brand-line {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-    header .logo {
-      width: 28px; height: 28px;
-      border-radius: 7px;
-      flex-shrink: 0;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 0.95rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
+    header .brand-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    header .logo { width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0; }
+    header h1 { margin: 0; font-size: 0.95rem; font-weight: 700; white-space: nowrap; }
     header h1 span { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
     header .actions { display: flex; gap: 6px; flex-shrink: 0; }
     header button {
-      border: 0;
-      border-radius: 8px;
-      padding: 7px 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: #24352e;
-      color: var(--text);
+      border: 0; border-radius: 8px; padding: 7px 10px;
+      font-size: 0.75rem; font-weight: 600; cursor: pointer;
+      background: #24352e; color: var(--text);
     }
-    header #btnReport {
-      background: var(--accent);
-      color: #fff;
-    }
+    header #btnReport { background: var(--accent); color: #fff; }
     header #btnReport:disabled { opacity: 0.4; }
-
-    /* Prix officiels — bandeau compact */
     .prices {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px 14px;
-      padding: 6px 12px;
-      background: #121a16;
-      border-bottom: 1px solid var(--line);
-      font-size: 0.72rem;
-      color: var(--muted);
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+      padding: 6px 12px; background: #121a16; border-bottom: 1px solid var(--line);
+      font-size: 0.72rem; color: var(--muted);
     }
     .prices strong { color: var(--text); font-weight: 700; }
     .prices .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(31,143,86,0.15);
-      color: #b8e6c8;
-      font-weight: 600;
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+      border-radius: 999px; background: rgba(31,143,86,0.15); color: #b8e6c8; font-weight: 600;
     }
     .prices a { color: #8ec9a8; text-decoration: none; }
-    .prices a:hover { text-decoration: underline; }
-
     .layout {
-      display: grid;
-      grid-template-columns: minmax(260px, 300px) 1fr;
-      height: calc(100dvh - 44px - 32px - var(--safe-top) - var(--safe-bottom));
-      min-height: 0;
+      display: grid; grid-template-columns: minmax(260px, 300px) 1fr;
+      height: calc(100dvh - 44px - 32px - var(--safe-top) - var(--safe-bottom)); min-height: 0;
     }
     aside {
-      background: var(--panel);
-      overflow: auto;
-      padding: 10px;
-      border-right: 1px solid var(--line);
-      -webkit-overflow-scrolling: touch;
+      background: var(--panel); overflow: auto; padding: 10px;
+      border-right: 1px solid var(--line); -webkit-overflow-scrolling: touch;
     }
     #map { width: 100%; height: 100%; min-height: 180px; }
-
     .search {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 9px;
-      border: 1px solid var(--line);
-      background: #0f1714;
-      color: var(--text);
-      font-size: 0.85rem;
-      margin-bottom: 8px;
+      width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line);
+      background: #0f1714; color: var(--text); font-size: 0.85rem; margin-bottom: 8px;
     }
     #selInfo {
-      color: var(--muted);
-      font-size: 0.7rem;
-      line-height: 1.3;
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--line);
+      color: var(--muted); font-size: 0.7rem; line-height: 1.3;
+      margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
     }
-
     #brandGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5px;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--line);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+      margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
     }
     .bitem {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 7px;
-      border-radius: 9px;
-      border: 1px solid var(--line);
-      background: #0f1714;
-      color: var(--text);
-      text-align: left;
-      font-size: 0.68rem;
-      line-height: 1.2;
-      cursor: pointer;
+      display: flex; align-items: center; gap: 6px; padding: 6px 7px; border-radius: 9px;
+      border: 1px solid var(--line); background: #0f1714; color: var(--text);
+      text-align: left; font-size: 0.68rem; line-height: 1.2; cursor: pointer;
     }
-    .bitem.on {
-      border-color: rgba(255,255,255,0.28);
-      background: rgba(255,255,255,0.06);
-    }
+    .bitem.on { border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.06); }
     .mini {
-      width: 18px; height: 18px; border-radius: 50%;
-      display: inline-flex; align-items: center; justify-content: center;
-      background: #fff; border: 1.5px solid var(--c, #888);
-      overflow: hidden; flex-shrink: 0;
+      width: 18px; height: 18px; border-radius: 50%; display: inline-flex;
+      align-items: center; justify-content: center; background: #fff;
+      border: 1.5px solid var(--c, #888); overflow: hidden; flex-shrink: 0;
     }
     .mini img { width: 12px; height: 12px; object-fit: contain; }
-
     #list { display: flex; flex-direction: column; gap: 4px; }
     .row {
-      text-align: left;
-      background: #0f1714;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      padding: 7px 9px;
-      color: var(--text);
-      cursor: pointer;
-      width: 100%;
+      text-align: left; background: #0f1714; border: 1px solid var(--line);
+      border-radius: 9px; padding: 7px 9px; color: var(--text); cursor: pointer; width: 100%;
     }
     .row.on { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.05); }
     .row strong { display: block; font-size: 0.76rem; font-weight: 600; line-height: 1.25; }
     .row span { display: block; color: var(--muted); font-size: 0.64rem; margin-top: 1px; }
     .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; }
-    .dot.ok { background: #22c55e; }
-    .dot.no { background: #ef4444; }
+    .dot.ok { background: #22c55e; } .dot.no { background: #ef4444; }
     .note { color: var(--muted); font-size: 0.68rem; line-height: 1.35; margin-top: 10px; }
-
     #notice {
       position: fixed; left: 50%; bottom: calc(14px + var(--safe-bottom));
-      transform: translateX(-50%);
-      background: #1a2420; border: 1px solid var(--line);
-      padding: 9px 12px; border-radius: 11px;
-      opacity: 0; pointer-events: none; transition: opacity .2s;
-      z-index: 9999; max-width: min(90vw, 340px);
+      transform: translateX(-50%); background: #1a2420; border: 1px solid var(--line);
+      padding: 9px 12px; border-radius: 11px; opacity: 0; pointer-events: none;
+      transition: opacity .2s; z-index: 9999; max-width: min(90vw, 340px);
       font-size: 0.8rem; text-align: center;
     }
     #notice.on { opacity: 1; }
-
     #dlg {
-      position: fixed; inset: 0; margin: auto;
-      border: 1px solid var(--line); border-radius: 14px;
-      background: var(--panel); color: var(--text);
-      padding: 14px; width: min(400px, 92vw);
-      z-index: 10000;
+      position: fixed; inset: 0; margin: auto; border: 1px solid var(--line);
+      border-radius: 14px; background: var(--panel); color: var(--text);
+      padding: 14px; width: min(400px, 92vw); z-index: 10000;
     }
     #dlg[hidden] { display: none !important; }
     #dlg h3 { margin: 0 0 6px; font-size: 0.95rem; }
@@ -218,18 +119,13 @@
       border: 1px solid var(--line); background: #0f1714; color: var(--text);
     }
     .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
-    .dlg-actions button {
-      border: 0; border-radius: 9px; padding: 8px 12px;
-      font-weight: 600; cursor: pointer;
-    }
+    .dlg-actions button { border: 0; border-radius: 9px; padding: 8px 12px; font-weight: 600; cursor: pointer; }
     .dlg-actions .secondary { background: #24352e; color: var(--text); }
     .dlg-actions #btnSubmit { background: var(--accent); color: #fff; }
-
     .marker-wrap { position: relative; width: 30px; height: 30px; }
     .marker-wrap .brand {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: #fff; border: 2px solid var(--c, #16834d);
-      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%; background: #fff;
+      border: 2px solid var(--c, #16834d); display: flex; align-items: center; justify-content: center;
       box-shadow: 0 1px 4px rgba(0,0,0,.35); overflow: hidden;
     }
     .marker-wrap .brand img { width: 18px; height: 18px; object-fit: contain; }
@@ -237,25 +133,17 @@
       position: absolute; right: -1px; bottom: -1px;
       width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff;
     }
-    .marker-wrap .sd.ok { background: #22c55e; }
-    .marker-wrap .sd.no { background: #ef4444; }
-
-    /* Mobile : plus de place pour la carte */
+    .marker-wrap .sd.ok { background: #22c55e; } .marker-wrap .sd.no { background: #ef4444; }
     @media (max-width: 800px) {
       .layout {
         grid-template-columns: 1fr;
         grid-template-rows: minmax(34%, 38%) 1fr;
         height: calc(100dvh - 44px - 32px - var(--safe-top) - var(--safe-bottom));
       }
-      aside {
-        border-right: 0;
-        border-bottom: 1px solid var(--line);
-        padding: 8px 10px;
-      }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); padding: 8px 10px; }
       header { padding: 6px 10px; min-height: 40px; }
       header h1 { font-size: 0.88rem; }
       .prices { font-size: 0.65rem; padding: 5px 10px; gap: 6px 10px; }
-      #brandGrid { gap: 4px; }
       .bitem { font-size: 0.64rem; padding: 5px 6px; }
       .row strong { font-size: 0.72rem; }
       .row span { font-size: 0.6rem; }
@@ -277,38 +165,35 @@
       <button type="button" id="btnReport" disabled>Signaler</button>
     </div>
   </header>
-
   <div class="prices" id="pricesBar">
     <span class="tag">Super <strong>990</strong> F/L</span>
     <span class="tag">Gasoil <strong>755</strong> F/L</span>
     <span class="src">
       Source :
       <a href="https://primature.sn/publications/communiques-officiels/ajustement-des-prix-des-carburants-compter-du-samedi-15-aout" target="_blank" rel="noopener">Gouvernement du Sénégal</a>
-      · en vigueur depuis le 15 août 2026
+      · depuis le 15 août 2026
     </span>
   </div>
-
   <div class="layout">
     <aside>
       <input class="search" id="q" type="search" placeholder="Rechercher station, ville, marque…" autocomplete="off">
-      <div id="selInfo">Sélectionnez une station pour signaler.</div>
+      <div id="selInfo">Par défaut : disponible. Signalez une pénurie si besoin.</div>
       <div id="brandGrid"></div>
       <div id="list"></div>
       <p id="sourceNote" class="note"></p>
     </aside>
     <div id="map"></div>
   </div>
-
   <div id="notice"></div>
   <div id="dlg" hidden>
     <h3>Signaler la disponibilité</h3>
     <p id="dlgDesc" class="note" style="margin:0 0 4px"></p>
     <label for="avail">État</label>
     <select id="avail">
-      <option value="available">Disponible</option>
-      <option value="shortage">En pénurie / rupture</option>
+      <option value="shortage">En pénurie / pas de carburant</option>
+      <option value="available">Disponible (carburant OK)</option>
     </select>
-    <label for="fuel">Carburant (optionnel)</label>
+    <label for="fuel">Carburant concerné (optionnel)</label>
     <select id="fuel">
       <option value="">Non précisé</option>
       <option value="essence">Essence</option>
@@ -320,7 +205,6 @@
       <button type="button" id="btnSubmit">Envoyer</button>
     </div>
   </div>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="stations-shell-1.js"></script>
   <script src="stations-shell-2.js"></script>
