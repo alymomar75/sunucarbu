@@ -2,70 +2,113 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f7f1">
 <title>SunuCarbu — Stations-service au Sénégal</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
-*{box-sizing:border-box}body{margin:0;height:100vh;font:14px/1.4 system-ui,sans-serif;background:#f4f7f1;color:#233128;display:grid;grid-template-columns:300px 1fr}
-@media(max-width:760px){body{grid-template-columns:1fr;grid-template-rows:auto 1fr}.side{max-height:40vh;overflow:auto}}
-.side{border-right:1px solid #dce5da;padding:16px;overflow:auto;background:#f4f7f1}
-h1{margin:0;font-size:18px}h1 span{color:#e8a522}
-.muted{color:#647469;font-size:12px;margin:4px 0 12px}
-#map{height:100%;min-height:300px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #dce5da;border-radius:8px;background:#edf3eb;cursor:pointer;font-size:12px;margin:4px 4px 4px 0}
+*{box-sizing:border-box}
+:root{--bg:#f4f7f1;--panel:#fff;--line:#dce5da;--text:#233128;--muted:#647469;--accent:#16834d;--gold:#e8a522;--danger:#c84942}
+body{margin:0;height:100vh;font:14px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--text);display:grid;grid-template-columns:320px 1fr;overflow:hidden}
+@media(max-width:760px){body{grid-template-columns:1fr;grid-template-rows:auto 1fr}.side{max-height:46vh;border-right:0;border-bottom:1px solid var(--line)}}
+.side{z-index:5;overflow:auto;padding:16px 16px 20px;background:var(--bg);border-right:1px solid var(--line)}
+h1{margin:0;font-size:18px;letter-spacing:.01em}h1 span{color:var(--gold)}
+.cap{margin:2px 0 12px;color:var(--muted);font-size:11px}
+.sec{margin:16px 0 8px;color:#415347;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pcard{padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+.pcard strong{display:block;font-size:11px}
+.pcard span{display:block;margin-top:5px;color:var(--gold);font-size:15px;font-weight:700}
+.pcard small{display:block;margin-top:4px;color:var(--muted);font-size:9px}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.links a{color:#126b3d;font-size:10px;font-weight:650;text-decoration:none}
+.links a:hover{text-decoration:underline}
+#map{height:100%;min-height:280px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:#edf3eb;cursor:pointer;font-size:12px;margin:3px 3px 3px 0;color:inherit}
 .btn.primary{background:#eaf5ed;border-color:#b4d7bb;color:#126b3d}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.list{display:grid;gap:6px;max-height:220px;overflow:auto;margin-top:8px}
-.row{padding:8px 10px;border:1px solid #dce5da;border-radius:8px;background:#fff;cursor:pointer;text-align:left}
+input[type=search],.search{width:100%;min-height:38px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:6px 0}
+.list{display:grid;gap:6px;max-height:200px;overflow:auto;margin-top:6px}
+.row{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);cursor:pointer;text-align:left}
 .row:hover,.row.on{border-color:#94c4a1;background:#eff8f0}
-.row strong{display:block;font-size:12px}.row span{font-size:10px;color:#647469}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.row strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row span{font-size:10px;color:var(--muted)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
 .dot.ok{background:#22c55e}.dot.no{background:#ef4444}
 .marker-wrap{position:relative;display:inline-flex}
-.brand{width:28px;height:28px;border-radius:50%;border:2px solid var(--c,#16834d);background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,.3)}
+.brand{width:28px;height:28px;border-radius:50%;border:2px solid var(--c,#16834d);background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,.35)}
 .brand img{width:20px;height:20px;object-fit:contain}
 .sd{position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .sd.ok{background:#22c55e}.sd.no{background:#ef4444}
-.dlg{position:fixed;z-index:1000;top:80px;left:16px;width:min(320px,calc(100% - 32px));padding:14px;background:#fff;border:1px solid #394958;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.dlg{position:fixed;z-index:1000;top:72px;left:16px;width:min(320px,calc(100% - 32px));padding:14px;background:rgba(255,255,255,.98);border:1px solid #394958;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
 .dlg[hidden]{display:none}
-.dlg label{display:block;margin:10px 0 4px;font-size:11px;color:#647469}
-.dlg select{width:100%;min-height:36px;border:1px solid #dce5da;border-radius:7px;padding:0 8px}
+.dlg h2{margin:0;font-size:15px}
+.dlg p{color:var(--muted);font-size:11px}
+.dlg label{display:block;margin:10px 0 4px;font-size:11px;color:var(--muted)}
+.dlg select{width:100%;min-height:36px;border:1px solid var(--line);border-radius:7px;padding:0 8px;background:var(--panel)}
 .notice{display:none;padding:10px;margin:8px 0;border-radius:8px;background:#fff0ee;color:#9b332c;font-size:12px;border:1px solid #e4b7b2}
 .notice.on{display:block}
-.legend{font-size:11px;margin-top:10px;padding:8px;background:#fff;border:1px solid #dce5da;border-radius:8px}
+.legend{font-size:11px;margin-top:10px;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:9px}
+.note{margin:8px 0 0;color:var(--muted);font-size:10px;line-height:1.45}
+.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.bitem{display:flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:#fbfdf9;font-size:10px}
+.bitem .mini{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--c,#16834d);background:#fff;display:grid;place-items:center;overflow:hidden;flex:0 0 20px}
+.bitem .mini img{width:14px;height:14px;object-fit:contain}
 </style>
 </head>
 <body>
 <aside class="side">
   <h1>Sunu<span>Carbu</span></h1>
-  <p class="muted">Stations-service au Sénégal · point vert = dispo · rouge = rupture (jusqu'à 19h Dakar)</p>
+  <p class="cap">Stations-service au Sénégal · couverture non exhaustive</p>
   <div id="notice" class="notice"></div>
-  <input id="q" placeholder="Rechercher…" style="width:100%;min-height:38px;padding:0 10px;border:1px solid #dce5da;border-radius:8px;margin-bottom:8px">
+
+  <div class="sec">Prix réglementés</div>
+  <div class="prices">
+    <div class="pcard"><strong>Super carburant</strong><span>990 F CFA / L</span><small>Depuis le 15 août 2026</small></div>
+    <div class="pcard"><strong>Gasoil</strong><span>755 F CFA / L</span><small>Depuis le 15 août 2026</small></div>
+  </div>
+  <div class="links">
+    <a href="https://energie-mines.gouv.sn/" target="_blank" rel="noopener">Ministère de l’Énergie ↗</a>
+    <a href="https://crse.sn/" target="_blank" rel="noopener">Régulateur CRSE ↗</a>
+  </div>
+
+  <div class="sec">Stations <span id="count" style="font-weight:600;letter-spacing:0;text-transform:none;color:var(--muted)"></span></div>
+  <input class="search" id="q" type="search" placeholder="Rechercher station, ville, marque…">
   <div>
     <button class="btn" id="btnLocate" type="button">◎ Près de moi</button>
-    <button class="btn primary" id="btnReport" type="button" disabled>Signaler</button>
+    <button class="btn primary" id="btnReport" type="button" disabled>Signaler disponibilité</button>
   </div>
-  <div class="list" id="list"><div class="muted">Chargement…</div></div>
+  <div class="list" id="list"><div class="note">Chargement des stations…</div></div>
+  <p class="note" id="sourceNote">Sources : jeux fournis (Shell, TotalEnergies, OLA, ELTON, Star Oil, API, Touba Oil, MKA, SGF…) · emplacements à vérifier.</p>
+  <div class="links">
+    <a href="https://shell.fuellocationmaps.com/fr/sen/map" target="_blank" rel="noopener">Shell ↗</a>
+    <a href="https://totalenergies.sn/stations-service/trouver-une-station" target="_blank" rel="noopener">TotalEnergies ↗</a>
+    <a href="https://www.olaenergy.com/ola-service-stations" target="_blank" rel="noopener">OLA ↗</a>
+    <a href="https://www.eltonoil.com/stations-elton/" target="_blank" rel="noopener">ELTON ↗</a>
+  </div>
+
   <div class="legend">
-    <div><span class="dot ok"></span> Disponible &nbsp; <span class="dot no"></span> Rupture</div>
-    <div class="muted" style="margin-top:6px">Signalements valables jusqu'à 19h (Dakar). Partage via JSONBin (optionnel).</div>
-    <div id="selInfo" class="muted" style="margin-top:8px">Sélectionnez une station</div>
+    <div><span class="dot ok"></span> Disponible &nbsp; <span class="dot no"></span> Rupture (jusqu’à 19h Dakar)</div>
+    <div class="sec" style="margin-top:12px">Marques</div>
+    <div class="brand-grid" id="brandGrid"></div>
+    <div id="selInfo" class="note" style="margin-top:8px">Sélectionnez une station pour signaler.</div>
   </div>
+  <p class="note">Prix et signalements non présentés comme vérifiés. Carte © OpenStreetMap.</p>
 </aside>
 <div id="map"></div>
 <section class="dlg" id="dlg" hidden>
-  <h2 style="margin:0;font-size:15px">Signaler la disponibilité</h2>
-  <p id="dlgDesc" class="muted"></p>
+  <h2>Signaler la disponibilité</h2>
+  <p id="dlgDesc"></p>
   <label>Observation</label>
   <select id="avail"><option value="available">Carburant disponible</option><option value="shortage">Rupture de stock</option></select>
-  <label>Type</label>
+  <label>Type de carburant</label>
   <select id="fuel"><option value="super">Super</option><option value="diesel">Gasoil</option><option value="both">Les deux</option></select>
   <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
     <button class="btn" id="btnCancel" type="button">Annuler</button>
     <button class="btn primary" id="btnSubmit" type="button">Publier</button>
   </div>
 </section>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="stations-shell.js"></script>
 <script src="stations-data.js"></script>
 <script src="stations-mka.js"></script>
