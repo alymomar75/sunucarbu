@@ -1,15 +1,35 @@
-window.sunuCarbuShellStations = (function(){
-  var S = [["10125489","KOUMPENTOUM","",13.981342,-14.568527],["10125488","DIAROUME","",13.981356,-14.802292],["10125487","KOUNGHEUL","",13.981356,-14.802292],["10125475","VDN","Dakar",14.72,-17.46],["10125470","ALMADIES","Rond Point de Ngor - Almadies, Dakar",14.7455,-17.5102],["10125471","NGOR","Route Des Almadies - Ngor, Dakar",14.7472,-17.5165],["10125472","OUAKAM","Ouakam, Dakar",14.72,-17.48],["10125473","TOUBA PREFECTURE","Touba",14.834383,-15.890022],["10125474","TOUBA 2","Touba",14.822992,-15.896375],["10125476","MBACKE","Mbacke",14.802233,-15.906719],["10125477","TAMBACOUNDA","Tambacounda",13.774164,-13.677083],["10125478","KAOLACK","Kaolack",14.15,-16.07],["10125479","THIES","Thies",14.79,-16.93],["10125480","ST LOUIS CENTRE","Saint-Louis",16.018536,-16.490506],["10125481","ZIGUINCHOR","Ziguinchor",12.583881,-16.262658],["10125482","KOLDA","Kolda",12.868817,-14.899133],["10125483","KEDOUGOU","Kedougou",12.573556,-12.208858],["10125484","DIAMNIADIO","Diamniadio",14.72,-17.19],["10125485","RUFISQUE","Rufisque",14.71,-17.27],["10125486","MBOUR","Mbour",14.42,-16.96]];
-  return S.map(function(r){
-    return {
-      id: "shell-" + r[0],
-      brand: "Shell",
-      name: (String(r[1]).toUpperCase().indexOf("SHELL")===0) ? r[1] : ("SHELL " + r[1]),
-      address: r[2],
-      lat: r[3],
-      lon: r[4],
-      source: "Shell Station Locator",
-      sourceUrl: "https://find.shell.com/sn/fuel/locations/en_US"
-    };
-  });
+window.sunuCarbuShellStations = window.sunuCarbuShellStations || [];
+(function(){
+  var FALLBACK = [
+    {id:"shell-almadies",brand:"Shell",name:"SHELL ALMADIES",address:"Rond Point de Ngor - Almadies, Dakar",lat:14.743342,lon:-17.511444},
+    {id:"shell-vdn",brand:"Shell",name:"SHELL VDN",address:"VDN Face Cices, Dakar",lat:14.746546,lon:-17.46716},
+    {id:"shell-touba",brand:"Shell",name:"SHELL TOUBA PREFECTURE",address:"Touba",lat:14.834383,lon:-15.890022},
+    {id:"shell-thies",brand:"Shell",name:"SHELL THIES",address:"Thiès",lat:14.782011,lon:-16.952711},
+    {id:"shell-stlouis",brand:"Shell",name:"SHELL ST LOUIS CENTRE",address:"Saint-Louis",lat:16.018536,lon:-16.490506},
+    {id:"shell-ziguinchor",brand:"Shell",name:"SHELL ZIGUINCHOR",address:"Ziguinchor",lat:12.583881,lon:-16.262658},
+    {id:"shell-tambacounda",brand:"Shell",name:"SHELL TAMBACOUNDA",address:"Tambacounda",lat:13.774164,lon:-13.677083},
+    {id:"shell-kolda",brand:"Shell",name:"SHELL KOLDA",address:"Kolda",lat:12.868817,lon:-14.899133},
+    {id:"shell-kaolack",brand:"Shell",name:"SHELL KAOLACK",address:"Kaolack",lat:14.147442,lon:-16.091639},
+    {id:"shell-mbour",brand:"Shell",name:"SHELL MBOUR",address:"Mbour",lat:14.42232,lon:-16.95008}
+  ];
+  window.sunuCarbuShellStations = FALLBACK;
+  window.sunuCarbuShellReady = fetch(
+    "https://shellgsllocator.geoapp.me/api/v2/locations/within_bounds?sw[]=12&sw[]=-18&ne[]=17&ne[]=-11&autoload=true&travelmode=driving&format=json"
+  ).then(function(r){ return r.json(); }).then(function(d){
+    var locs = (d.locations || []).filter(function(x){ return (x.country_code||"").toUpperCase()==="SN"; });
+    if (!locs.length) return;
+    window.sunuCarbuShellStations = locs.map(function(x){
+      return {
+        id: "shell-" + x.id,
+        brand: "Shell",
+        name: x.name || "Shell",
+        address: x.address || x.city || "",
+        lat: +x.lat,
+        lon: +(x.lng || x.lon),
+        source: "Shell Station Locator",
+        sourceUrl: "https://find.shell.com/sn/fuel/locations/en_US"
+      };
+    }).filter(function(s){ return s.lat && s.lon; });
+    if (typeof window.sunuCarbuReloadStations === "function") window.sunuCarbuReloadStations();
+  }).catch(function(){});
 })();
