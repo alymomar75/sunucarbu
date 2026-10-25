@@ -429,9 +429,14 @@
     showNotice(ok ? "Signalement partagé avec tous." : (SHARED.binId ? "Enregistré localement (partage échoué)." : "Enregistré sur cet appareil."));
   };
 
+  window.sunuCarbuReloadStations = function(){ loadStations(); };
   (async () => {
     await fetchShared();
     loadStations();
+    Promise.allSettled([
+      window.sunuCarbuShellReady,
+      window.sunuCarbuTotalReady
+    ]).then(function(){ loadStations(); });
     setInterval(async () => {
       await fetchShared();
       refreshMarkers();
