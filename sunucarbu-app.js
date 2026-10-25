@@ -28,6 +28,8 @@
   let selected = null;
   let sharedCache = {};
   let activeBrandFilter = "";
+  let userPos = null;
+  let userMarker = null;
   const group = L.layerGroup();
   const map = L.map("map", { doubleClickZoom: false, minZoom: 6 }).setView([14.5, -14.5], 7);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -74,6 +76,34 @@
 
   function stationLabel(s) {
     return s.name || (s.tags && s.tags.name) || s.brand || "Station";
+  }
+
+  function haversineKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const toRad = (d) => d * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function formatDistance(km) {
+    if (km < 1) return Math.round(km * 1000) + " m";
+    if (km < 10) return km.toFixed(1).replace(".", ",") + " km";
+    return Math.round(km) + " km";
+  }
+
+  function estimateMinutes(km) {
+    const speedKmh = 25;
+    return Math.max(1, Math.round((km / speedKmh) * 60));
+  }
+
+  function formatEta(min) {
+    if (min < 60) return min + " min";
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return m ? h + " h " + m + " min" : h + " h";
   }
 
   function isReportValid(report) {
@@ -163,7 +193,12 @@
     $("btnReport").disabled = false;
     const r = getReport(s.key);
     let info = stationLabel(s) + " · " + stationBrand(s);
-    if (s.address) info += " · " + s.address;
+    if (userPos) {
+      const km = haversineKm(userPos.lat, userPos.lon, s.lat, s.lon);
+      info += " · " + formatDistance(km) + " · ~" + formatEta(estimateMinutes(km));
+    } else if (s.address) {
+      info += " · " + s.address;
+    }
     if (r) {
       const t = new Date(r.timestamp).toLocaleString("fr-FR", { timeZone: "Africa/Dakar" });
       info += r.availability === "shortage"
@@ -182,25 +217,41 @@
     const q = ($("q").value || "").toLowerCase().trim();
     const list = $("list");
     list.innerHTML = "";
-    const filtered = stations.filter((s) => {
+    let filtered = stations.filter((s) => {
       const brand = stationBrand(s);
       if (activeBrandFilter && brand !== activeBrandFilter) return false;
       if (!q) return true;
       const t = (stationLabel(s) + " " + brand + " " + (s.address || "")).toLowerCase();
       return t.includes(q);
-    }).slice(0, 100);
+    });
+    if (userPos) {
+      filtered = filtered.map((s) => {
+        const km = haversineKm(userPos.lat, userPos.lon, s.lat, s.lon);
+        return { s, km };
+      }).sort((a, b) => a.km - b.km).slice(0, 100);
+    } else {
+      filtered = filtered.slice(0, 100).map((s) => ({ s, km: null }));
+    }
     if (!filtered.length) {
       list.innerHTML = '<div class="note">Aucune station</div>';
       return;
     }
-    filtered.forEach((s) => {
+    filtered.forEach(({ s, km }) => {
       const status = getStatus(s.key);
       const row = document.createElement("button");
       row.type = "button";
       row.className = "row" + (selected && selected.key === s.key ? " on" : "");
       const dot = status === "available" ? '<span class="dot ok"></span>'
         : status === "shortage" ? '<span class="dot no"></span>' : "";
-      row.innerHTML = `<strong>${dot}${stationLabel(s)}</strong><span>${stationBrand(s)} · ${s.address || "Sénégal"}</span>`;
+      let meta = stationBrand(s);
+      if (km != null) {
+        meta += " · " + formatDistance(km) + " · ~" + formatEta(estimateMinutes(km));
+      } else if (s.address) {
+        meta += " · " + s.address;
+      } else {
+        meta += " · Sénégal";
+      }
+      row.innerHTML = `<strong>${dot}${stationLabel(s)}</strong><span>${meta}</span>`;
       row.onclick = () => selectStation(s, true);
       list.appendChild(row);
     });
@@ -328,9 +379,31 @@
   $("q").addEventListener("input", applyFilters);
   $("btnLocate").onclick = () => {
     if (!navigator.geolocation) return showNotice("Géolocalisation indisponible");
+    showNotice("Localisation en cours…");
     navigator.geolocation.getCurrentPosition((pos) => {
-      map.setView([pos.coords.latitude, pos.coords.longitude], 13);
-    }, () => showNotice("Impossible d'obtenir votre position"));
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      userPos = { lat, lon };
+      if (userMarker) {
+        userMarker.setLatLng([lat, lon]);
+      } else {
+        const blueIcon = L.divIcon({
+          className: "",
+          html: `<span style="display:block;width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 2px #2563eb,0 2px 8px rgba(0,0,0,.35)"></span>`,
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
+        });
+        userMarker = L.marker([lat, lon], { icon: blueIcon, zIndexOffset: 1000, title: "Votre position" }).addTo(map);
+        userMarker.bindPopup("<strong>Vous êtes ici</strong>");
+      }
+      map.setView([lat, lon], 14);
+      renderList();
+      showNotice("Position affichée · stations triées par proximité");
+    }, () => showNotice("Impossible d'obtenir votre position"), {
+      enableHighAccuracy: true,
+      timeout: 12000,
+      maximumAge: 60000
+    });
   };
   $("btnReport").onclick = () => {
     if (!selected) return;
