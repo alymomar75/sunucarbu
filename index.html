@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="SunuCarbu">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="icon.svg">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="icon" type="image/svg+xml" href="icon.svg?v=4">
+  <link rel="apple-touch-icon" href="icon.svg?v=4">
   <title>SunuCarbu — Stations-service Sénégal</title>
   <meta name="description" content="Carte des stations-service du Sénégal : disponibilité, pénuries signalées et prix officiels.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
@@ -33,8 +33,11 @@
     }
     header .brand-line { display: flex; align-items: center; gap: 10px; min-width: 0; }
     header .logo {
-      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
-      background: transparent; object-fit: contain;
+      width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+      display: block;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      background: #fff;
     }
     header h1 { margin: 0; font-size: 1rem; font-weight: 700; white-space: nowrap; color: #111; }
     header h1 span { color: var(--muted); font-weight: 500; font-size: 0.82rem; }
@@ -164,7 +167,26 @@
 <body>
   <header>
     <div class="brand-line">
-      <img class="logo" src="icon.svg" alt="SunuCarbu">
+      <svg class="logo" viewBox="0 0 512 512" width="42" height="42" aria-label="SunuCarbu" role="img">
+        <rect width="512" height="512" rx="96" fill="#ffffff"/>
+        <circle cx="256" cy="118" r="36" fill="#F5A623"/>
+        <g stroke="#F5A623" stroke-width="10" stroke-linecap="round">
+          <line x1="256" y1="58" x2="256" y2="42"/>
+          <line x1="256" y1="194" x2="256" y2="178"/>
+          <line x1="196" y1="118" x2="180" y2="118"/>
+          <line x1="332" y1="118" x2="316" y2="118"/>
+          <line x1="213" y1="75" x2="201" y2="63"/>
+          <line x1="299" y1="161" x2="311" y2="173"/>
+          <line x1="299" y1="75" x2="311" y2="63"/>
+          <line x1="213" y1="161" x2="201" y2="173"/>
+        </g>
+        <text x="248" y="305" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="175" fill="#0B3D91" letter-spacing="-10">SC</text>
+        <g transform="translate(330,250)">
+          <path d="M0,-38 C-18,-38 -32,-24 -32,-6 C-32,18 0,42 0,42 C0,42 32,18 32,-6 C32,-24 18,-38 0,-38 Z" fill="#0B3D91"/>
+          <circle cx="0" cy="-8" r="12" fill="#ffffff"/>
+        </g>
+        <text x="256" y="410" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="40" fill="#0B3D91" letter-spacing="3">SUNU CARBU</text>
+      </svg>
       <h1>SunuCarbu <span id="count"></span></h1>
     </div>
     <div class="actions">
