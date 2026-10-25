@@ -1,37 +1,81 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SunuCarbu — Mise a jour</title>
-  <style>
-    body { margin:0; min-height:100vh; display:grid; place-items:center; font-family:system-ui,sans-serif; background:#f4f7f1; color:#233128; }
-    .box { max-width:480px; padding:28px; background:#fff; border:1px solid #dce5da; border-radius:14px; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,.06); }
-    h1 { margin:0 0 8px; font-size:22px; }
-    h1 span { color:#e8a522; }
-    p { color:#647469; font-size:14px; line-height:1.5; }
-    a { color:#16834d; font-weight:600; }
-    code { background:#edf3eb; padding:2px 6px; border-radius:4px; font-size:12px; }
-    .steps { text-align:left; margin:18px 0 0; padding:14px; background:#fbfdf9; border-radius:10px; font-size:13px; }
-    .steps ol { margin:8px 0 0; padding-left:20px; }
-    .steps li { margin:6px 0; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SunuCarbu — Stations-service au Sénégal</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}body{margin:0;height:100vh;font:14px/1.4 system-ui,sans-serif;background:#f4f7f1;color:#233128;display:grid;grid-template-columns:300px 1fr}
+@media(max-width:760px){body{grid-template-columns:1fr;grid-template-rows:auto 1fr}.side{max-height:40vh;overflow:auto}}
+.side{border-right:1px solid #dce5da;padding:16px;overflow:auto;background:#f4f7f1}
+h1{margin:0;font-size:18px}h1 span{color:#e8a522}
+.muted{color:#647469;font-size:12px;margin:4px 0 12px}
+#map{height:100%;min-height:300px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #dce5da;border-radius:8px;background:#edf3eb;cursor:pointer;font-size:12px;margin:4px 4px 4px 0}
+.btn.primary{background:#eaf5ed;border-color:#b4d7bb;color:#126b3d}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.list{display:grid;gap:6px;max-height:220px;overflow:auto;margin-top:8px}
+.row{padding:8px 10px;border:1px solid #dce5da;border-radius:8px;background:#fff;cursor:pointer;text-align:left}
+.row:hover,.row.on{border-color:#94c4a1;background:#eff8f0}
+.row strong{display:block;font-size:12px}.row span{font-size:10px;color:#647469}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.dot.ok{background:#22c55e}.dot.no{background:#ef4444}
+.marker-wrap{position:relative;display:inline-flex}
+.brand{width:28px;height:28px;border-radius:50%;border:2px solid var(--c,#16834d);background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,.3)}
+.brand img{width:20px;height:20px;object-fit:contain}
+.sd{position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.sd.ok{background:#22c55e}.sd.no{background:#ef4444}
+.dlg{position:fixed;z-index:1000;top:80px;left:16px;width:min(320px,calc(100% - 32px));padding:14px;background:#fff;border:1px solid #394958;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.dlg[hidden]{display:none}
+.dlg label{display:block;margin:10px 0 4px;font-size:11px;color:#647469}
+.dlg select{width:100%;min-height:36px;border:1px solid #dce5da;border-radius:7px;padding:0 8px}
+.notice{display:none;padding:10px;margin:8px 0;border-radius:8px;background:#fff0ee;color:#9b332c;font-size:12px;border:1px solid #e4b7b2}
+.notice.on{display:block}
+.legend{font-size:11px;margin-top:10px;padding:8px;background:#fff;border:1px solid #dce5da;border-radius:8px}
+</style>
 </head>
 <body>
-  <div class="box">
-    <h1>Sunu<span>Carbu</span></h1>
-    <p>Le site est en cours de mise a jour (points vert/rouge, logos, signalements partages).</p>
-    <div class="steps">
-      <strong>Pour reactiver la carte maintenant :</strong>
-      <ol>
-        <li>Telecharge le fichier <code>sunucarbu-complet.html</code> dans la conversation Grok</li>
-        <li>Va sur <a href="https://github.com/alymomar75/sunucarbu" target="_blank">github.com/alymomar75/sunucarbu</a></li>
-        <li>Clique <strong>Add file → Upload files</strong></li>
-        <li>Depose le fichier, renomme-le en <code>index.html</code> (remplace l'existant)</li>
-        <li>Commit — le site sera a jour en ~1 minute</li>
-      </ol>
-    </div>
-    <p style="margin-top:16px"><a href="https://github.com/alymomar75/sunucarbu">Ouvrir le depot GitHub</a></p>
+<aside class="side">
+  <h1>Sunu<span>Carbu</span></h1>
+  <p class="muted">Stations-service au Sénégal · point vert = dispo · rouge = rupture (jusqu'à 19h Dakar)</p>
+  <div id="notice" class="notice"></div>
+  <input id="q" placeholder="Rechercher…" style="width:100%;min-height:38px;padding:0 10px;border:1px solid #dce5da;border-radius:8px;margin-bottom:8px">
+  <div>
+    <button class="btn" id="btnLocate" type="button">◎ Près de moi</button>
+    <button class="btn primary" id="btnReport" type="button" disabled>Signaler</button>
   </div>
+  <div class="list" id="list"><div class="muted">Chargement…</div></div>
+  <div class="legend">
+    <div><span class="dot ok"></span> Disponible &nbsp; <span class="dot no"></span> Rupture</div>
+    <div class="muted" style="margin-top:6px">Signalements valables jusqu'à 19h (Dakar). Partage via JSONBin (optionnel).</div>
+    <div id="selInfo" class="muted" style="margin-top:8px">Sélectionnez une station</div>
+  </div>
+</aside>
+<div id="map"></div>
+<section class="dlg" id="dlg" hidden>
+  <h2 style="margin:0;font-size:15px">Signaler la disponibilité</h2>
+  <p id="dlgDesc" class="muted"></p>
+  <label>Observation</label>
+  <select id="avail"><option value="available">Carburant disponible</option><option value="shortage">Rupture de stock</option></select>
+  <label>Type</label>
+  <select id="fuel"><option value="super">Super</option><option value="diesel">Gasoil</option><option value="both">Les deux</option></select>
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+    <button class="btn" id="btnCancel" type="button">Annuler</button>
+    <button class="btn primary" id="btnSubmit" type="button">Publier</button>
+  </div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="stations-shell.js"></script>
+<script src="stations-data.js"></script>
+<script src="stations-mka.js"></script>
+<script src="stations-ola.js"></script>
+<script src="stations-elton.js"></script>
+<script src="stations-star.js"></script>
+<script src="stations-api.js"></script>
+<script src="stations-touba-oil.js"></script>
+<script src="stations-marques-complementaires.js"></script>
+<script src="frontiere-senegal.js"></script>
+<script src="sunucarbu-app.js"></script>
 </body>
 </html>
