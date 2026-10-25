@@ -1,7 +1,7 @@
 (() => {
   const BRANDS = {
     "Shell": { color: "#c82b24", logo: "assets/brands/Shell.png", initials: "S" },
-    "TotalEnergies": { color: "#0873b9", logo: "https://totalenergies.sn/themes/custom/butterfly_theme/logo.svg", initials: "T" },
+    "TotalEnergies": { color: "#0873b9", logo: "https://totalenergies.sn/themes/custom/butterfly_theme/logo.svg?v=1.2", initials: "T" },
     "OLA Energy": { color: "#70449b", logo: "assets/brands/ola.png", initials: "OLA" },
     "ELTON": { color: "#c96918", logo: "assets/brands/elton.png", initials: "E" },
     "Eydon": { color: "#2d3585", logo: "assets/brands/eydon.png", initials: "E" },
