@@ -27,6 +27,7 @@
   let stations = [];
   let selected = null;
   let sharedCache = {};
+  let activeBrandFilter = "";
   const group = L.layerGroup();
   const map = L.map("map", { doubleClickZoom: false, minZoom: 6 }).setView([14.5, -14.5], 7);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -182,8 +183,10 @@
     const list = $("list");
     list.innerHTML = "";
     const filtered = stations.filter((s) => {
+      const brand = stationBrand(s);
+      if (activeBrandFilter && brand !== activeBrandFilter) return false;
       if (!q) return true;
-      const t = (stationLabel(s) + " " + stationBrand(s) + " " + (s.address || "")).toLowerCase();
+      const t = (stationLabel(s) + " " + brand + " " + (s.address || "")).toLowerCase();
       return t.includes(q);
     }).slice(0, 100);
     if (!filtered.length) {
@@ -212,16 +215,46 @@
       const b = stationBrand(s);
       counts[b] = (counts[b] || 0) + 1;
     });
-    Object.keys(counts).sort().forEach((name) => {
+    const allBtn = document.createElement("button");
+    allBtn.type = "button";
+    allBtn.className = "bitem" + (!activeBrandFilter ? " on" : "");
+    allBtn.innerHTML = `<span class="mini" style="--c:#16834d;font-size:8px;font-weight:800;color:#16834d">★</span><span>Toutes (${stations.length})</span>`;
+    allBtn.onclick = () => { activeBrandFilter = ""; applyFilters(); };
+    grid.appendChild(allBtn);
+    Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b, "fr")).forEach((name) => {
       const st = BRANDS[name] || { color: "#16834d", initials: name.slice(0, 3) };
-      const el = document.createElement("div");
-      el.className = "bitem";
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "bitem" + (activeBrandFilter === name ? " on" : "");
+      el.setAttribute("aria-pressed", String(activeBrandFilter === name));
       const mini = st.logo
         ? `<span class="mini" style="--c:${st.color}"><img src="${st.logo}" alt="" onerror="this.remove()"></span>`
         : `<span class="mini" style="--c:${st.color};font-size:7px;font-weight:800;color:${st.color}">${st.initials}</span>`;
       el.innerHTML = `${mini}<span>${name} (${counts[name]})</span>`;
+      el.onclick = () => {
+        activeBrandFilter = activeBrandFilter === name ? "" : name;
+        applyFilters();
+      };
       grid.appendChild(el);
     });
+  }
+
+  function applyFilters() {
+    const q = ($("q").value || "").toLowerCase().trim();
+    renderList();
+    stations.forEach((s) => {
+      if (!s.marker) return;
+      const brand = stationBrand(s);
+      const matchBrand = !activeBrandFilter || brand === activeBrandFilter;
+      const t = (stationLabel(s) + " " + brand + " " + (s.address || "")).toLowerCase();
+      const matchQ = !q || t.includes(q);
+      if (matchBrand && matchQ) {
+        if (!group.hasLayer(s.marker)) group.addLayer(s.marker);
+      } else if (group.hasLayer(s.marker)) {
+        group.removeLayer(s.marker);
+      }
+    });
+    renderBrandLegend();
   }
 
   function normalize(arr, source) {
@@ -292,7 +325,7 @@
     } catch { return false; }
   }
 
-  $("q").addEventListener("input", renderList);
+  $("q").addEventListener("input", applyFilters);
   $("btnLocate").onclick = () => {
     if (!navigator.geolocation) return showNotice("Géolocalisation indisponible");
     navigator.geolocation.getCurrentPosition((pos) => {
