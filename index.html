@@ -2,16 +2,36 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>SunuCarbu — Stations-service au Sénégal</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <style>body{margin:0;font-family:system-ui;display:grid;place-items:center;height:100vh;background:#f4f7f1}#msg{padding:24px;max-width:420px;text-align:center}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SunuCarbu — Mise a jour</title>
+  <style>
+    body { margin:0; min-height:100vh; display:grid; place-items:center; font-family:system-ui,sans-serif; background:#f4f7f1; color:#233128; }
+    .box { max-width:480px; padding:28px; background:#fff; border:1px solid #dce5da; border-radius:14px; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,.06); }
+    h1 { margin:0 0 8px; font-size:22px; }
+    h1 span { color:#e8a522; }
+    p { color:#647469; font-size:14px; line-height:1.5; }
+    a { color:#16834d; font-weight:600; }
+    code { background:#edf3eb; padding:2px 6px; border-radius:4px; font-size:12px; }
+    .steps { text-align:left; margin:18px 0 0; padding:14px; background:#fbfdf9; border-radius:10px; font-size:13px; }
+    .steps ol { margin:8px 0 0; padding-left:20px; }
+    .steps li { margin:6px 0; }
+  </style>
 </head>
 <body>
-  <div id="msg">
-    <h1>SunuCarbu</h1>
-    <p>Mise à jour du site en cours. Téléchargez le fichier HTML complet depuis la conversation et remplacez <code>index.html</code> dans le dépôt GitHub, ou attendez la fin du déploiement automatique.</p>
-    <p><a href="https://github.com/alymomar75/sunucarbu">Voir le dépôt</a></p>
+  <div class="box">
+    <h1>Sunu<span>Carbu</span></h1>
+    <p>Le site est en cours de mise a jour (points vert/rouge, logos, signalements partages).</p>
+    <div class="steps">
+      <strong>Pour reactiver la carte maintenant :</strong>
+      <ol>
+        <li>Telecharge le fichier <code>sunucarbu-complet.html</code> dans la conversation Grok</li>
+        <li>Va sur <a href="https://github.com/alymomar75/sunucarbu" target="_blank">github.com/alymomar75/sunucarbu</a></li>
+        <li>Clique <strong>Add file → Upload files</strong></li>
+        <li>Depose le fichier, renomme-le en <code>index.html</code> (remplace l'existant)</li>
+        <li>Commit — le site sera a jour en ~1 minute</li>
+      </ol>
+    </div>
+    <p style="margin-top:16px"><a href="https://github.com/alymomar75/sunucarbu">Ouvrir le depot GitHub</a></p>
   </div>
 </body>
 </html>
