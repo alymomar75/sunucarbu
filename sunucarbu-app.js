@@ -35,6 +35,14 @@
   }).addTo(map);
   group.addTo(map);
 
+  try {
+    if (window.sunuCarbuSenegalBoundary) {
+      L.geoJSON(window.sunuCarbuSenegalBoundary, {
+        style: { color: "#16834d", weight: 1.5, fillOpacity: 0.03 }
+      }).addTo(map);
+    }
+  } catch (e) {}
+
   const $ = (id) => document.getElementById(id);
   const notice = $("notice");
   function showNotice(msg) {
@@ -53,7 +61,7 @@
     if (/star/i.test(b)) return "Star Oil";
     if (/touba\s*sandaga/i.test(b)) return "Touba Sandaga Oil";
     if (/touba/i.test(b)) return "Touba Oil";
-    if (/^api$/i.test(b)) return "API";
+    if (/^api$/i.test(b) || /\bapi\b/i.test(b)) return "API";
     if (/mka/i.test(b)) return "MKA Excellence";
     if (/petrosen/i.test(b)) return "PETROSEN";
     if (/\bsgf\b/i.test(b)) return "SGF";
@@ -105,9 +113,9 @@
   }
 
   function markHtml(brand, status) {
-    const st = BRANDS[brand] || { color: "#16834d", initials: "?" };
+    const st = BRANDS[brand] || { color: "#16834d", initials: (brand || "?").slice(0, 3).toUpperCase() };
     const img = st.logo
-      ? `<img src="${st.logo}" alt="" draggable="false">`
+      ? `<img src="${st.logo}" alt="" draggable="false" onerror="this.style.display='none';this.parentNode.textContent='${st.initials}'">`
       : `<span style="font-size:8px;font-weight:800;color:${st.color}">${st.initials}</span>`;
     const dot = (status === "available" || status === "shortage")
       ? `<span class="sd ${status === "shortage" ? "no" : "ok"}"></span>` : "";
@@ -126,7 +134,10 @@
       }),
       title: stationLabel(s) + (status === "shortage" ? " · Rupture" : status === "available" ? " · Disponible" : "")
     });
-    m.bindPopup(`<strong>${stationLabel(s)}</strong><br>${brand}<br>${s.address || ""}`);
+    const src = s.sourceUrl
+      ? `<br><a href="${s.sourceUrl}" target="_blank" rel="noopener">Source ↗</a>`
+      : (s.source ? `<br><small>Source : ${s.source}</small>` : "");
+    m.bindPopup(`<strong>${stationLabel(s)}</strong><br>${brand}<br>${s.address || ""}${src}`);
     m.on("click", () => selectStation(s, false));
     s.marker = m;
     group.addLayer(m);
@@ -151,6 +162,7 @@
     $("btnReport").disabled = false;
     const r = getReport(s.key);
     let info = stationLabel(s) + " · " + stationBrand(s);
+    if (s.address) info += " · " + s.address;
     if (r) {
       const t = new Date(r.timestamp).toLocaleString("fr-FR", { timeZone: "Africa/Dakar" });
       info += r.availability === "shortage"
@@ -173,9 +185,9 @@
       if (!q) return true;
       const t = (stationLabel(s) + " " + stationBrand(s) + " " + (s.address || "")).toLowerCase();
       return t.includes(q);
-    }).slice(0, 80);
+    }).slice(0, 100);
     if (!filtered.length) {
-      list.innerHTML = '<div class="muted">Aucune station</div>';
+      list.innerHTML = '<div class="note">Aucune station</div>';
       return;
     }
     filtered.forEach((s) => {
@@ -191,6 +203,27 @@
     });
   }
 
+  function renderBrandLegend() {
+    const grid = $("brandGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    const counts = {};
+    stations.forEach((s) => {
+      const b = stationBrand(s);
+      counts[b] = (counts[b] || 0) + 1;
+    });
+    Object.keys(counts).sort().forEach((name) => {
+      const st = BRANDS[name] || { color: "#16834d", initials: name.slice(0, 3) };
+      const el = document.createElement("div");
+      el.className = "bitem";
+      const mini = st.logo
+        ? `<span class="mini" style="--c:${st.color}"><img src="${st.logo}" alt="" onerror="this.remove()"></span>`
+        : `<span class="mini" style="--c:${st.color};font-size:7px;font-weight:800;color:${st.color}">${st.initials}</span>`;
+      el.innerHTML = `${mini}<span>${name} (${counts[name]})</span>`;
+      grid.appendChild(el);
+    });
+  }
+
   function normalize(arr, source) {
     return (arr || []).map((r, i) => ({
       key: r.id || r.key || (source + "-" + i),
@@ -203,7 +236,7 @@
       sourceUrl: r.sourceUrl || "",
       stationType: r.stationType || "",
       tags: r.tags || {}
-    })).filter((s) => s.lat && s.lon);
+    })).filter((s) => s.lat && s.lon && isFinite(s.lat) && isFinite(s.lon));
   }
 
   function loadStations() {
@@ -216,7 +249,7 @@
       normalize(window.sunuCarbuStarStations, "Star"),
       normalize(window.sunuCarbuApiStations, "API"),
       normalize(window.sunuCarbuToubaOilStations, "Touba"),
-      normalize(window.sunuCarbuMarquesComplementaires, "Autres")
+      normalize(window.sunuCarbuComplementaryBrandStations, "Complementaires")
     ];
     const seen = new Set();
     stations = [];
@@ -228,7 +261,11 @@
     group.clearLayers();
     stations.forEach(addMarker);
     renderList();
-    $("selInfo").textContent = stations.length + " stations chargées";
+    renderBrandLegend();
+    const countEl = $("count");
+    if (countEl) countEl.textContent = "(" + stations.length + ")";
+    const note = $("sourceNote");
+    if (note) note.textContent = stations.length + " stations référencées (Shell, TotalEnergies, OLA, ELTON, Star Oil, API, Touba Oil, MKA, SGF et autres). Emplacements à vérifier.";
   }
 
   async function fetchShared() {
@@ -264,7 +301,7 @@
   };
   $("btnReport").onclick = () => {
     if (!selected) return;
-    $("dlgDesc").textContent = stationLabel(selected) + " · valable jusqu'à 19h Dakar";
+    $("dlgDesc").textContent = stationLabel(selected) + " · observation valable jusqu'à 19h (Dakar), non vérifiée.";
     $("dlg").hidden = false;
   };
   $("btnCancel").onclick = () => { $("dlg").hidden = true; };
@@ -284,7 +321,7 @@
     $("dlg").hidden = true;
     refreshMarkers();
     selectStation(selected, false);
-    showNotice(ok ? "Signalement partagé avec tous." : (SHARED.binId ? "Enregistré localement (partage échoué)." : "Enregistré sur cet appareil. Configurez JSONBin pour le partage public."));
+    showNotice(ok ? "Signalement partagé avec tous." : (SHARED.binId ? "Enregistré localement (partage échoué)." : "Enregistré sur cet appareil."));
   };
 
   (async () => {
