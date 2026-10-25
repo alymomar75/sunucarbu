@@ -1,19 +1,11 @@
-window.sunuCarbuShellStations = (function(){
-  var S = [].concat(
-    window.sunuCarbuShellPart1 || [],
-    window.sunuCarbuShellPart2 || [],
-    window.sunuCarbuShellPart3 || []
-  );
-  return S.map(function(r){
-    return {
-      id: "shell-" + r[0],
-      brand: "Shell",
-      name: (String(r[1]).toUpperCase().indexOf("SHELL")===0) ? r[1] : ("SHELL " + r[1]),
-      address: r[2],
-      lat: r[3],
-      lon: r[4],
-      source: "Shell Station Locator (officiel)",
-      sourceUrl: "https://find.shell.com/sn/fuel/locations/en_US"
-    };
-  });
-})();
+window.sunuCarbuShellStations = window.sunuCarbuShellStations || [];
+window.sunuCarbuShellReady = Promise.all([
+  fetch("stations-shell-a.json").then(function(r){return r.json()}),
+  fetch("stations-shell-b.json").then(function(r){return r.json()})
+]).then(function(parts){
+  var list = [].concat(parts[0]||[], parts[1]||[]);
+  if (list.length) {
+    window.sunuCarbuShellStations = list;
+    if (typeof window.sunuCarbuReloadStations === "function") window.sunuCarbuReloadStations();
+  }
+}).catch(function(){});
