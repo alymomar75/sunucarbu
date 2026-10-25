@@ -51,7 +51,8 @@ input[type=search],.search{width:100%;min-height:38px;padding:0 10px;border:1px 
 .legend{font-size:11px;margin-top:10px;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:9px}
 .note{margin:8px 0 0;color:var(--muted);font-size:10px;line-height:1.45}
 .brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
-.bitem{display:flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:#fbfdf9;font-size:10px}
+.bitem{display:flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:#fbfdf9;font-size:10px;cursor:pointer;width:100%;text-align:left;color:inherit;font:inherit}
+.bitem:hover,.bitem.on{border-color:#94c4a1;background:#eff8f0}
 .bitem .mini{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--c,#16834d);background:#fff;display:grid;place-items:center;overflow:hidden;flex:0 0 20px}
 .bitem .mini img{width:14px;height:14px;object-fit:contain}
 </style>
@@ -89,7 +90,7 @@ input[type=search],.search{width:100%;min-height:38px;padding:0 10px;border:1px 
 
   <div class="legend">
     <div><span class="dot ok"></span> Disponible &nbsp; <span class="dot no"></span> Rupture (jusqu’à 19h Dakar)</div>
-    <div class="sec" style="margin-top:12px">Marques</div>
+    <div class="sec" style="margin-top:12px">Marques — cliquer pour filtrer</div>
     <div class="brand-grid" id="brandGrid"></div>
     <div id="selInfo" class="note" style="margin-top:8px">Sélectionnez une station pour signaler.</div>
   </div>
