@@ -3,52 +3,319 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f1714">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>SunuCarbu — Stations-service Sénégal</title>
   <meta name="description" content="Carte des stations-service du Sénégal avec signalement de disponibilité.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
-    :root { --bg:#0f1714; --panel:#16211c; --line:#24352e; --text:#e8f2ec; --muted:#9bb5a8; --accent:#16834d; --danger:#c23b3b; }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); }
-    header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line); background: var(--panel); }
-    header h1 { margin:0; font-size:1.05rem; font-weight:700; }
-    header .sub { color: var(--muted); font-size:0.8rem; }
-    .layout { display:grid; grid-template-columns: 340px 1fr; height: calc(100vh - 52px); }
-    aside { border-right:1px solid var(--line); background: var(--panel); overflow:auto; padding:12px; }
-    #map { width:100%; height:100%; }
-    .search { width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:#0f1714; color:var(--text); margin-bottom:10px; }
-    .actions { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-    button, .btn { border:0; border-radius:10px; padding:9px 12px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer; }
-    button.secondary { background:#24352e; color:var(--text); }
-    button:disabled { opacity:0.5; cursor:not-allowed; }
-    #brandGrid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:10px 0 14px; }
-    .bitem { display:flex; align-items:center; gap:8px; padding:8px; border-radius:10px; border:1px solid var(--line); background:#0f1714; color:var(--text); text-align:left; font-size:0.78rem; }
-    .bitem.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-    .mini { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:#fff; border:2px solid var(--c,#16834d); overflow:hidden; flex-shrink:0; }
-    .mini img { width:16px; height:16px; object-fit:contain; }
-    #list { display:flex; flex-direction:column; gap:6px; }
-    .row { text-align:left; background:#0f1714; border:1px solid var(--line); border-radius:10px; padding:10px; color:var(--text); }
-    .row.on { border-color: var(--accent); }
-    .row strong { display:block; font-size:0.9rem; }
-    .row span { color:var(--muted); font-size:0.78rem; }
-    .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
-    .dot.ok { background:#22c55e; } .dot.no { background:#ef4444; }
-    .note { color:var(--muted); font-size:0.78rem; line-height:1.4; }
-    #notice { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#102018; border:1px solid var(--line); padding:10px 14px; border-radius:12px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:9999; max-width:90vw; }
-    #notice.on { opacity:1; }
-    #dlg { position:fixed; inset:0; margin:auto; border:1px solid var(--line); border-radius:14px; background:var(--panel); color:var(--text); padding:16px; width:min(420px,92vw); z-index:10000; }
-    #dlg[hidden] { display:none !important; }
-    #dlg label { display:block; margin:8px 0 4px; font-size:0.85rem; color:var(--muted); }
-    #dlg select { width:100%; padding:8px; border-radius:8px; border:1px solid var(--line); background:#0f1714; color:var(--text); }
-    .dlg-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:14px; }
-    .marker-wrap { position:relative; width:30px; height:30px; }
-    .marker-wrap .brand { width:28px; height:28px; border-radius:50%; background:#fff; border:2px solid var(--c,#16834d); display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.35); overflow:hidden; }
-    .marker-wrap .brand img { width:18px; height:18px; object-fit:contain; }
-    .marker-wrap .sd { position:absolute; right:-1px; bottom:-1px; width:10px; height:10px; border-radius:50%; border:2px solid #fff; }
-    .marker-wrap .sd.ok { background:#22c55e; } .marker-wrap .sd.no { background:#ef4444; }
+    :root {
+      --bg: #0f1714;
+      --panel: #141c18;
+      --line: rgba(255,255,255,0.08);
+      --line-soft: rgba(255,255,255,0.05);
+      --text: #f2f5f3;
+      --muted: #9aada3;
+      --accent: #2d9b5f;
+      --accent-soft: rgba(45,155,95,0.18);
+      --danger: #c23b3b;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      padding-left: var(--safe-left);
+      padding-right: var(--safe-right);
+    }
+
+    /* Header neutre (pas de vert dominant) */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #f7f9f8;
+      color: #142018;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #142018;
+      letter-spacing: -0.01em;
+    }
+    header .sub {
+      color: #5c6f66;
+      font-size: 0.72rem;
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+    header .actions { display: flex; gap: 8px; flex-shrink: 0; }
+    header button {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    header button.secondary {
+      background: #e8eeeb;
+      color: #1a2a22;
+    }
+    header #btnReport {
+      background: #1a2a22;
+      color: #fff;
+    }
+    header #btnReport:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) 1fr;
+      height: calc(100vh - 56px - var(--safe-top) - var(--safe-bottom));
+      min-height: 0;
+    }
+
+    aside {
+      background: var(--panel);
+      overflow: auto;
+      padding: 12px 12px 20px;
+      border-right: 1px solid var(--line-soft);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #map { width: 100%; height: 100%; min-height: 200px; background: #1a2420; }
+
+    .search {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0f1714;
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    .search::placeholder { color: #6d8177; }
+
+    #selInfo {
+      color: var(--muted);
+      font-size: 0.75rem;
+      line-height: 1.35;
+      padding: 0 2px 10px;
+      border-bottom: 1px solid var(--line-soft);
+      margin-bottom: 10px;
+    }
+
+    /* Marques — séparateur doux */
+    #brandGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin: 0 0 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line-soft);
+      box-shadow: 0 8px 12px -12px rgba(0,0,0,0.35);
+    }
+    .bitem {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 8px;
+      border-radius: 11px;
+      border: 1px solid var(--line);
+      background: #0f1714;
+      color: var(--text);
+      text-align: left;
+      font-size: 0.72rem;
+      line-height: 1.25;
+      cursor: pointer;
+    }
+    .bitem.on {
+      border-color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.06);
+      box-shadow: none;
+    }
+    .mini {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 1.5px solid var(--c, #888);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .mini img { width: 14px; height: 14px; object-fit: contain; }
+
+    /* Liste stations — texte plus compact */
+    #list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .row {
+      text-align: left;
+      background: #0f1714;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--text);
+      cursor: pointer;
+      width: 100%;
+    }
+    .row.on {
+      border-color: rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.05);
+    }
+    .row strong {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    .row span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.68rem;
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+    .dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .dot.ok { background: #22c55e; }
+    .dot.no { background: #ef4444; }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.4;
+      margin-top: 12px;
+    }
+
+    #notice {
+      position: fixed;
+      left: 50%;
+      bottom: calc(16px + var(--safe-bottom));
+      transform: translateX(-50%);
+      background: #1a2420;
+      border: 1px solid var(--line);
+      padding: 10px 14px;
+      border-radius: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      z-index: 9999;
+      max-width: min(90vw, 360px);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+    #notice.on { opacity: 1; }
+
+    #dlg {
+      position: fixed;
+      inset: 0;
+      margin: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 16px;
+      width: min(400px, 92vw);
+      max-height: min(90vh, 520px);
+      z-index: 10000;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    }
+    #dlg[hidden] { display: none !important; }
+    #dlg h3 { margin: 0 0 6px; font-size: 1rem; }
+    #dlg label { display: block; margin: 10px 0 4px; font-size: 0.8rem; color: var(--muted); }
+    #dlg select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #0f1714;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+    .dlg-actions button {
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .dlg-actions .secondary { background: #24352e; color: var(--text); }
+    .dlg-actions #btnSubmit { background: #1a2a22; color: #fff; }
+
+    .marker-wrap { position: relative; width: 30px; height: 30px; }
+    .marker-wrap .brand {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--c, #16834d);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,.35); overflow: hidden;
+    }
+    .marker-wrap .brand img { width: 18px; height: 18px; object-fit: contain; }
+    .marker-wrap .sd {
+      position: absolute; right: -1px; bottom: -1px;
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    .marker-wrap .sd.ok { background: #22c55e; }
+    .marker-wrap .sd.no { background: #ef4444; }
+
+    /* Mobile / tablette */
     @media (max-width: 800px) {
-      .layout { grid-template-columns: 1fr; grid-template-rows: 45% 55%; height: calc(100vh - 52px); }
-      aside { border-right:0; border-top:1px solid var(--line); }
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(42%, 48%) minmax(52%, 58%);
+        height: calc(100dvh - 56px - var(--safe-top) - var(--safe-bottom));
+      }
+      aside {
+        border-right: 0;
+        border-bottom: none;
+        /* Séparateur doux vers la carte */
+        box-shadow: inset 0 -12px 16px -16px rgba(0,0,0,0.45);
+        padding-bottom: 8px;
+      }
+      #map {
+        border-top: 1px solid var(--line-soft);
+      }
+      header { padding: 10px 12px; }
+      header h1 { font-size: 0.95rem; }
+      header .sub { font-size: 0.68rem; max-width: 52vw; }
+      header button { padding: 7px 10px; font-size: 0.75rem; }
+      .row strong { font-size: 0.76rem; }
+      .row span { font-size: 0.64rem; }
+      .bitem { font-size: 0.68rem; padding: 6px 7px; }
+    }
+
+    @media (max-width: 380px) {
+      #brandGrid { grid-template-columns: 1fr; }
+      header .sub { display: none; }
     }
   </style>
 </head>
@@ -66,17 +333,17 @@
   <div class="layout">
     <aside>
       <input class="search" id="q" type="search" placeholder="Rechercher une station, ville, marque…" autocomplete="off">
-      <div id="selInfo" class="note">Sélectionnez une station pour signaler.</div>
+      <div id="selInfo">Sélectionnez une station pour signaler.</div>
       <div id="brandGrid"></div>
       <div id="list"></div>
-      <p id="sourceNote" class="note" style="margin-top:12px"></p>
+      <p id="sourceNote" class="note"></p>
     </aside>
     <div id="map"></div>
   </div>
   <div id="notice"></div>
   <div id="dlg" hidden>
-    <h3 style="margin:0 0 8px">Signaler la disponibilité</h3>
-    <p id="dlgDesc" class="note"></p>
+    <h3>Signaler la disponibilité</h3>
+    <p id="dlgDesc" class="note" style="margin:0 0 4px"></p>
     <label for="avail">État</label>
     <select id="avail">
       <option value="available">Disponible</option>
