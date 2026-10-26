@@ -7,7 +7,7 @@ window.sunuCarbuStarStations = [
   { id: "star-malick-sy", brand: "Star Oil", name: "Star Oil Malick Sy", address: "Avenue Malick Sy, Dakar", lon: -17.4395, lat: 14.6775, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-yoff", brand: "Star Oil", name: "Star Oil Yoff", address: "Yoff, Dakar", lon: -17.4710, lat: 14.7550, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-sicap-mbao", brand: "Star Oil", name: "Star Oil Sicap Mbao", address: "Sicap Mbao, Dakar", lon: -17.3410, lat: 14.7350, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
-  { id: "star-cayar", brand: "Star Oil", name: "Star Oil Cayar", address: "Cayar", lon: -17.1250, lat: 14.9280, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
+  { id: "star-cayar", brand: "Star Oil", name: "Star Oil Cayar", address: "Cayar", lon: -17.121341, lat: 14.919552, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/sn?page=2" },
   { id: "star-mekhe", brand: "Star Oil", name: "Star Oil Mekhé", address: "Mekhé", lon: -16.6220, lat: 15.1150, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-taredji", brand: "Star Oil", name: "Star Oil Taredji", address: "Taredji", lon: -15.2100, lat: 16.5500, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-ross-bethio", brand: "Star Oil", name: "Star Oil Ross Béthio", address: "Ross Béthio", lon: -15.9920, lat: 16.2750, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
