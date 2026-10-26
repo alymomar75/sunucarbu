@@ -6,7 +6,7 @@ window.sunuCarbuStarStations = [
   { id: "star-cyrnos", brand: "Star Oil", name: "Star Oil Cyrnos", address: "Dakar Plateau", lon: -17.4380, lat: 14.6715, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-malick-sy", brand: "Star Oil", name: "Star Oil Malick Sy", address: "Avenue Malick Sy, Dakar", lon: -17.4395, lat: 14.6775, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-yoff", brand: "Star Oil", name: "Star Oil Yoff", address: "Yoff, Dakar", lon: -17.4710, lat: 14.7550, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
-  { id: "star-sicap-mbao", brand: "Star Oil", name: "Star Oil Sicap Mbao", address: "Sicap Mbao, Dakar", lon: -17.3410, lat: 14.7350, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
+  { id: "star-sicap-mbao", brand: "Star Oil", name: "Star Oil Sicap Mbao", address: "Sicap Mbao", lon: -17.002783, lat: 14.660917, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/node/197" },
   { id: "star-cayar", brand: "Star Oil", name: "Star Oil Cayar", address: "Cayar", lon: -17.121341, lat: 14.919552, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/sn?page=2" },
   { id: "star-mekhe", brand: "Star Oil", name: "Star Oil Mekhé", address: "Mekhé", lon: -16.6220, lat: 15.1150, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-taredji", brand: "Star Oil", name: "Star Oil Taredji", address: "Taredji", lon: -15.2100, lat: 16.5500, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
@@ -14,5 +14,10 @@ window.sunuCarbuStarStations = [
   { id: "star-fatick", brand: "Star Oil", name: "Star Oil Fatick", address: "Fatick", lon: -16.4110, lat: 14.3310, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-tambacounda", brand: "Star Oil", name: "Star Oil Tamba", address: "Tambacounda", lon: -13.6670, lat: 13.7680, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
   { id: "star-sedhiou", brand: "Star Oil", name: "Star Oil Sédhiou", address: "Sédhiou", lon: -15.5560, lat: 12.7080, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
-  { id: "star-kedougou", brand: "Star Oil", name: "Star Oil Kédougou", address: "Kédougou", lon: -12.1740, lat: 12.5530, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" }
+  { id: "star-kedougou", brand: "Star Oil", name: "Star Oil Kédougou", address: "Kédougou", lon: -12.1740, lat: 12.5530, country: "Sénégal", source: "Données fournies par l’utilisateur (non vérifiées)" },
+  { id: "star-bargny", brand: "Star Oil", name: "Star Oil Bargny", address: "Bargny", lon: -17.2140135, lat: 14.7016348, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/sn?page=2" },
+  { id: "star-keur-ndiaye-lo", brand: "Star Oil", name: "Star Oil Keur Ndiaye Lo", address: "Keur Ndiaye Lo", lon: -17.2341002, lat: 14.757663, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/node/198" },
+  { id: "star-khombole", brand: "Star Oil", name: "Star Oil Khombole", address: "Khombole", lon: -16.70172, lat: 14.76803, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/index.php/en/stations-services" },
+  { id: "star-tivaouane", brand: "Star Oil", name: "Star Oil Tivaouane", address: "Tivaouane", lon: -16.80432, lat: 14.96209, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/en/pays/senegal" },
+  { id: "star-khodoba", brand: "Star Oil", name: "Star Oil Khodoba", address: "Khodoba", lon: -17.097702, lat: 14.765953, country: "Sénégal", source: "Star Oil Group Sénégal", sourceUrl: "https://staroilgroup.com/en/pays/senegal" }
 ];
