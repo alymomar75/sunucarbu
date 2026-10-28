@@ -14,6 +14,7 @@
     "EDK Oil": { color: "#c6362d", logo: "assets/brands/edkoil.png", initials: "EDK" },
     "Omega Petroleum": { color: "#51438c", logo: "assets/brands/omegapetroleum.png", initials: "Ω" },
     "Neptune Oil Sénégal": { color: "#16749a", logo: "assets/brands/NeptuneOil.png", initials: "N" },
+    "Zen": { color: "#2f8b55", logo: "assets/brands/zen.png", initials: "ZEN" }, 
     "PETROSEN": { color: "#006d8f", logo: "assets/brands/petrosen.png", initials: "PETRO" },
     "Autres (OSM)": { color: "#465a50", initials: "OSM" }
   };
@@ -71,6 +72,7 @@
     if (/\bedk\b/i.test(b)) return "EDK Oil";
     if (/omega/i.test(b)) return "Omega Petroleum";
     if (/neptune/i.test(b)) return "Neptune Oil Sénégal";
+    if (/zen/i.test(b)) return "Zen";
     return b || (s.source === "OpenStreetMap" ? "Autres (OSM)" : "Autre");
   }
 
