@@ -15,7 +15,7 @@
     "Omega Petroleum": { color: "#51438c", logo: "assets/brands/omegapetroleum.png", initials: "Ω" },
     "Neptune Oil Sénégal": { color: "#16749a", logo: "assets/brands/NeptuneOil.png", initials: "N" },
     "Zen": { color: "#2f8b55", logo: "assets/brands/zen.png", initials: "ZEN" }, 
-    "Puma Energy": { color: "#d81e05", logo: "assets/brands/puma.png", initials: "PUMA" }
+    "Puma Energy": { color: "#d81e05", logo: "assets/brands/puma.png", initials: "PUMA" },
     "PETROSEN": { color: "#006d8f", logo: "assets/brands/petrosen.png", initials: "PETRO" },
     "Oryx Energies": { color: "#e36b22", logo: "assets/brands/oryx.png", initials: "ORYX" },
     "Autres (OSM)": { color: "#465a50", initials: "OSM" }
