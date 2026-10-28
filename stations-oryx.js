@@ -14,8 +14,8 @@ window.sunuCarbuOryxStations = [
   { id: "oryx-kafountine-peche", brand: "Oryx Energies", name: "ORYX Kafountine Station Pêche", address: "Kafountine", lon: -16.86023, lat: 14.18347, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
   { id: "oryx-mbour-peche", brand: "Oryx Energies", name: "ORYX Mbour Station Pêche", address: "Mbour", lon: -16.75206, lat: 12.92675, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
   { id: "oryx-ndande", brand: "Oryx Energies", name: "ORYX Ndande", address: "Ndande", lon: -16.90663, lat: 15.18651, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
-  { id: "oryx-cap-skiring-peche", brand: "Oryx Energies", name: "ORYX Cap Skiring Station Pêche", address: "Cap Skirring", lon: -16.52617, lat: 15.28406, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
-  { id: "oryx-ziguinchor", brand: "Oryx Energies", name: "ORYX Ziguinchor", address: "Ziguinchor", lon: -16.74515, lat: 12.38568, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
-  { id: "oryx-bambali", brand: "Oryx Energies", name: "ORYX Bambali", address: "Bambali", lon: -16.27005, lat: 12.54139, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
-  { id: "oryx-st-louis-peche", brand: "Oryx Energies", name: "ORYX St Louis Station Pêche", address: "Saint-Louis", lon: -15.65738, lat: 12.60521, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" }
+  { id: "oryx-cap-skiring-peche", brand: "Oryx Energies", name: "ORYX Cap Skiring Station Pêche", address: "Cap Skirring", lon: -16.74515, lat: 12.38568, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
+  { id: "oryx-ziguinchor", brand: "Oryx Energies", name: "ORYX Ziguinchor", address: "Ziguinchor", lon: -16.27005, lat: 12.54139, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
+  { id: "oryx-bambali", brand: "Oryx Energies", name: "ORYX Bambali", address: "Bambali", lon: -15.65738, lat: 12.60521, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" },
+  { id: "oryx-st-louis-peche", brand: "Oryx Energies", name: "ORYX St Louis Station Pêche", address: "Saint-Louis", lon: -16.50908, lat: 15.99125, country: "Sénégal", sourceUrl: "https://www.oryxenergies.com/sn/fr/nos-implantations" }
 ];
