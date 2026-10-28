@@ -16,6 +16,7 @@
     "Neptune Oil Sénégal": { color: "#16749a", logo: "assets/brands/NeptuneOil.png", initials: "N" },
     "Zen": { color: "#2f8b55", logo: "assets/brands/zen.png", initials: "ZEN" }, 
     "PETROSEN": { color: "#006d8f", logo: "assets/brands/petrosen.png", initials: "PETRO" },
+    "Oryx Energies": { color: "#e36b22", logo: "assets/brands/oryx.png", initials: "ORYX" },
     "Autres (OSM)": { color: "#465a50", initials: "OSM" }
   };
 
@@ -69,6 +70,7 @@
     if (/mka/i.test(b)) return "MKA Excellence";
     if (/petrosen/i.test(b)) return "PETROSEN";
     if (/\bsgf\b/i.test(b)) return "SGF";
+    if (/oryx/i.test(b)) return "Oryx Energies";
     if (/\bedk\b/i.test(b)) return "EDK Oil";
     if (/omega/i.test(b)) return "Omega Petroleum";
     if (/neptune/i.test(b)) return "Neptune Oil Sénégal";
@@ -321,6 +323,7 @@
       normalize(window.sunuCarbuOlaStations, "OLA"),
       normalize(window.sunuCarbuEltonStations, "ELTON"),
       normalize(window.sunuCarbuStarStations, "Star"),
+      normalize(window.sunuCarbuOryxStations, "Oryx Energies"),
       normalize(window.sunuCarbuApiStations, "API"),
       normalize(window.sunuCarbuToubaOilStations, "Touba"),
       normalize(window.sunuCarbuZenStations, "Zen"),
