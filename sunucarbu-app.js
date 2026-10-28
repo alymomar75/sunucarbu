@@ -329,7 +329,7 @@
       normalize(window.sunuCarbuApiStations, "API"),
       normalize(window.sunuCarbuToubaOilStations, "Touba"),
       normalize(window.sunuCarbuZenStations, "Zen"),
-      normalize(window.sunuCarbuPumaStations, "Puma Energy")
+      normalize(window.sunuCarbuPumaStations, "Puma Energy"),
       normalize(window.sunuCarbuComplementaryBrandStations, "Complementaires")
     ];
     const seen = new Set();
