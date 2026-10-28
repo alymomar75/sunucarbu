@@ -15,6 +15,7 @@
     "Omega Petroleum": { color: "#51438c", logo: "assets/brands/omegapetroleum.png", initials: "Ω" },
     "Neptune Oil Sénégal": { color: "#16749a", logo: "assets/brands/NeptuneOil.png", initials: "N" },
     "Zen": { color: "#2f8b55", logo: "assets/brands/zen.png", initials: "ZEN" }, 
+    "Puma Energy": { color: "#d81e05", logo: "assets/brands/puma.png", initials: "PUMA" }
     "PETROSEN": { color: "#006d8f", logo: "assets/brands/petrosen.png", initials: "PETRO" },
     "Oryx Energies": { color: "#e36b22", logo: "assets/brands/oryx.png", initials: "ORYX" },
     "Autres (OSM)": { color: "#465a50", initials: "OSM" }
@@ -61,6 +62,7 @@
     if (/shell/i.test(b)) return "Shell";
     if (/total/i.test(b)) return "TotalEnergies";
     if (/ola/i.test(b)) return "OLA Energy";
+    if (/puma/i.test(b)) return "Puma Energy";
     if (/elton/i.test(b)) return "ELTON";
     if (/eydon/i.test(b)) return "Eydon";
     if (/star/i.test(b)) return "Star Oil";
@@ -327,6 +329,7 @@
       normalize(window.sunuCarbuApiStations, "API"),
       normalize(window.sunuCarbuToubaOilStations, "Touba"),
       normalize(window.sunuCarbuZenStations, "Zen"),
+      normalize(window.sunuCarbuPumaStations, "Puma Energy")
       normalize(window.sunuCarbuComplementaryBrandStations, "Complementaires")
     ];
     const seen = new Set();
