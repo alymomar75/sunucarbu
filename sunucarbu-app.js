@@ -52,6 +52,7 @@
   const $ = (id) => document.getElementById(id);
   const notice = $("notice");
   function showNotice(msg) {
+    if (!notice) return;
     notice.textContent = msg;
     notice.classList.add("on");
     setTimeout(() => notice.classList.remove("on"), 6000);
@@ -184,7 +185,8 @@
 
   function selectStation(s, pan) {
     selected = s;
-    $("btnReport").disabled = false;
+    const btnReport = $("btnReport");
+    if (btnReport) btnReport.disabled = false;
     const r = getReport(s.key);
     let info = stationLabel(s) + " · " + stationBrand(s);
     if (userPos) {
@@ -199,7 +201,8 @@
         ? ` · Pénurie signalée (${t})`
         : ` · Disponible signalé (${t})`;
     }
-    $("selInfo").textContent = info;
+    const selInfo = $("selInfo");
+    if (selInfo) selInfo.textContent = info;
     renderList();
     if (pan) {
       map.setView([s.lat, s.lon], Math.max(map.getZoom(), 14));
@@ -208,8 +211,10 @@
   }
 
   function renderList() {
-    const q = ($("q").value || "").toLowerCase().trim();
+    const qEl = $("q");
+    const q = (qEl ? qEl.value : "").toLowerCase().trim();
     const list = $("list");
+    if (!list) return;
     list.innerHTML = "";
     let filtered = stations.filter((s) => {
       const brand = stationBrand(s);
@@ -286,7 +291,8 @@
 
   function applyFilters() {
     renderList();
-    const q = ($("q").value || "").toLowerCase().trim();
+    const qEl = $("q");
+    const q = (qEl ? qEl.value : "").toLowerCase().trim();
     stations.forEach((s) => {
       if (!s.marker) return;
       const brand = stationBrand(s);
@@ -329,7 +335,7 @@
       normalize(window.sunuCarbuApiStations, "API"),
       normalize(window.sunuCarbuToubaOilStations, "Touba"),
       normalize(window.sunuCarbuZenStations, "Zen"),
-      normalize(window.sunuCarbuPumaStations, "Puma Energy"),
+      normalize(window.sunuCarbuPumaStations, "Puma Energy"), // <--- Virgule ajoutée ici
       normalize(window.sunuCarbuComplementaryBrandStations, "Complementaires")
     ];
     const seen = new Set();
@@ -373,59 +379,84 @@
     } catch { return false; }
   }
 
-  $("q").addEventListener("input", applyFilters);
-  $("btnLocate").onclick = () => {
-    if (!navigator.geolocation) return showNotice("Géolocalisation indisponible");
-    showNotice("Localisation en cours…");
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      userPos = { lat, lon };
-      if (userMarker) {
-        userMarker.setLatLng([lat, lon]);
-      } else {
-        const blueIcon = L.divIcon({
-          className: "",
-          html: `<span style="display:block;width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 2px #2563eb,0 2px 8px rgba(0,0,0,.35)"></span>`,
-          iconSize: [18, 18],
-          iconAnchor: [9, 9]
-        });
-        userMarker = L.marker([lat, lon], { icon: blueIcon, zIndexOffset: 1000, title: "Votre position" }).addTo(map);
-        userMarker.bindPopup("<strong>Vous êtes ici</strong>");
-      }
-      map.setView([lat, lon], 14);
-      renderList();
-      showNotice("Position affichée · stations triées par proximité");
-    }, () => showNotice("Impossible d'obtenir votre position"), {
-      enableHighAccuracy: true,
-      timeout: 12000,
-      maximumAge: 60000
-    });
-  };
-  $("btnReport").onclick = () => {
-    if (!selected) return;
-    $("dlgDesc").textContent = stationLabel(selected) + " · signalement libre, visible par tous (non vérifié officiellement).";
-    $("dlg").hidden = false;
-  };
-  $("btnCancel").onclick = () => { $("dlg").hidden = true; };
-  $("btnSubmit").onclick = async () => {
-    if (!selected) return;
-    const entry = {
-      availability: $("avail").value,
-      fuel: $("fuel").value,
-      timestamp: Date.now(),
-      shared: !!(SHARED.binId && SHARED.apiKey)
+  const qElem = $("q");
+  if (qElem) qElem.addEventListener("input", applyFilters);
+
+  const btnLocate = $("btnLocate");
+  if (btnLocate) {
+    btnLocate.onclick = () => {
+      if (!navigator.geolocation) return showNotice("Géolocalisation indisponible");
+      showNotice("Localisation en cours…");
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        userPos = { lat, lon };
+        if (userMarker) {
+          userMarker.setLatLng([lat, lon]);
+        } else {
+          const blueIcon = L.divIcon({
+            className: "",
+            html: `<span style="display:block;width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 2px #2563eb,0 2px 8px rgba(0,0,0,.35)"></span>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+          });
+          userMarker = L.marker([lat, lon], { icon: blueIcon, zIndexOffset: 1000, title: "Votre position" }).addTo(map);
+          userMarker.bindPopup("<strong>Vous êtes ici</strong>");
+        }
+        map.setView([lat, lon], 14);
+        renderList();
+        showNotice("Position affichée · stations triées par proximité");
+      }, () => showNotice("Impossible d'obtenir votre position"), {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 60000
+      });
     };
-    const local = getLocal();
-    local[selected.key] = entry;
-    localStorage.setItem("sunucarbu-local-reports-v1", JSON.stringify(local));
-    sharedCache[selected.key] = entry;
-    const ok = await pushShared(sharedCache);
-    $("dlg").hidden = true;
-    refreshMarkers();
-    selectStation(selected, false);
-    showNotice(ok ? "Signalement partagé avec tous." : (SHARED.binId ? "Enregistré localement (partage échoué)." : "Enregistré sur cet appareil."));
-  };
+  }
+
+  const btnReport = $("btnReport");
+  if (btnReport) {
+    btnReport.onclick = () => {
+      if (!selected) return;
+      const dlgDesc = $("dlgDesc");
+      if (dlgDesc) dlgDesc.textContent = stationLabel(selected) + " · signalement libre, visible par tous (non vérifié officiellement).";
+      const dlg = $("dlg");
+      if (dlg) dlg.hidden = false;
+    };
+  }
+
+  const btnCancel = $("btnCancel");
+  if (btnCancel) {
+    btnCancel.onclick = () => {
+      const dlg = $("dlg");
+      if (dlg) dlg.hidden = true;
+    };
+  }
+
+  const btnSubmit = $("btnSubmit");
+  if (btnSubmit) {
+    btnSubmit.onclick = async () => {
+      if (!selected) return;
+      const availEl = $("avail");
+      const fuelEl = $("fuel");
+      const entry = {
+        availability: availEl ? availEl.value : "available",
+        fuel: fuelEl ? fuelEl.value : "",
+        timestamp: Date.now(),
+        shared: !!(SHARED.binId && SHARED.apiKey)
+      };
+      const local = getLocal();
+      local[selected.key] = entry;
+      localStorage.setItem("sunucarbu-local-reports-v1", JSON.stringify(local));
+      sharedCache[selected.key] = entry;
+      const ok = await pushShared(sharedCache);
+      const dlg = $("dlg");
+      if (dlg) dlg.hidden = true;
+      refreshMarkers();
+      selectStation(selected, false);
+      showNotice(ok ? "Signalement partagé avec tous." : (SHARED.binId ? "Enregistré localement (partage échoué)." : "Enregistré sur cet appareil."));
+    };
+  }
 
   window.sunuCarbuReloadStations = function(){ loadStations(); };
   (async () => {
