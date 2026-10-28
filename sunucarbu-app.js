@@ -323,6 +323,7 @@
       normalize(window.sunuCarbuStarStations, "Star"),
       normalize(window.sunuCarbuApiStations, "API"),
       normalize(window.sunuCarbuToubaOilStations, "Touba"),
+      normalize(window.sunuCarbuZenStations, "Zen"),
       normalize(window.sunuCarbuComplementaryBrandStations, "Complementaires")
     ];
     const seen = new Set();
