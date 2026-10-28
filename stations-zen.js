@@ -14,7 +14,7 @@ window.sunuCarbuZenStations = [
   { id: "zen-ndayane", brand: "Zen", name: "Zen - Ndayane", address: "Ndayane", lon: -17.1246, lat: 14.5623, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
   { id: "zen-bargny", brand: "Zen", name: "Zen - Bargny", address: "Bargny", lon: -17.2253, lat: 14.6852, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
   { id: "zen-kayar", brand: "Zen", name: "Zen - Kayar", address: "Kayar", lon: -17.1277, lat: 14.9103, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
-  { id: "zen-tivaouane-peulh", brand: "Zen", name: "Zen - Tivaouane Peulh", address: "Tivaouane Peulh", lon: -17.2877, lat: 14.7978, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
+  { id: "zen-tivaouane-peulh", brand: "Zen", name: "Zen - Tivaouane Peulh", address: "Tivaouane Peulh", lon: -17.2878, lat: 14.7980, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
   { id: "zen-bayakh", brand: "Zen", name: "Zen - Bayakh", address: "Bayakh", lon: -17.1379, lat: 14.8305, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
   { id: "zen-ngaparou", brand: "Zen", name: "Zen - Ngaparou", address: "Ngaparou", lon: -17.0606, lat: 14.4654, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
   { id: "zen-mbour-2", brand: "Zen", name: "Zen - Mbour 2", address: "Mbour", lon: -16.9728, lat: 14.4090, country: "Sénégal", sourceUrl: "https://energie.zenithgroupe.com/" },
