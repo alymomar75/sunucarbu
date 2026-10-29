@@ -13,18 +13,18 @@ window.sunuCarbuSenePetroleStations = [
   {
     "id": "senepetrole-02",
     "brand": "Séné Pétrole",
-    "name": "Séné Pétrole Keur Massar",
-    "address": "Route de Keur Massar, Dakar",
+    "name": "Séné Pétrole Lac rose",
+    "address": "Route de Keur Massar, Dakar",    
     "country": "Sénégal",
-    "lat": 14.775821,
-    "lon": -17.314205,
+    "lat": 14.799137622327015,
+    "lon": -17.255950535753744,
     "source": "Google Maps",
     "sourceUrl": "https://maps.app.goo.gl/U4CCWih7jCG7zfmf7"
   },
   {
     "id": "senepetrole-03",
     "brand": "Séné Pétrole",
-    "name": "Séné Pétrole Rufisque",
+    "name": "Séné Pétrole NIAKHIRATE",
     "address": "Route Nationale 1, Rufisque",
     "country": "Sénégal",
     "lat": 14.712845,
