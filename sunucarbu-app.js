@@ -335,6 +335,7 @@ const SHARED = {
       normalize(window.sunuCarbuApiStations, "API"),
       normalize(window.sunuCarbuToubaOilStations, "Touba"),
       normalize(window.sunuCarbuZenStations, "Zen"),
+      normalize(window.sunuCarbuSenePetroleStations, "Séné Pétrole"),
       normalize(window.sunuCarbuPumaStations, "Puma Energy"), // <--- Virgule ajoutée ici
       normalize(window.sunuCarbuComplementaryBrandStations, "Complementaires")
     ];
