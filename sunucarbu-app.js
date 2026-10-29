@@ -21,9 +21,9 @@
     "Autres (OSM)": { color: "#465a50", initials: "OSM" }
   };
 
-  const SHARED = {
-    binId: localStorage.getItem("sunucarbu-jsonbin-id") || "",
-    apiKey: localStorage.getItem("sunucarbu-jsonbin-key") || "",
+const SHARED = {
+    binId: "6ae29494ffd5d1605394576e",
+    apiKey: "$2a$10$EYAsG1bBdPaO478pnrZsMOxcEayPOeJtlI7Kb99lw/dfbCKPBk4Ea",
     base: "https://api.jsonbin.io/v3/b"
   };
 
