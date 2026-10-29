@@ -17,6 +17,7 @@
     "Zen": { color: "#2f8b55", logo: "assets/brands/zen.png", initials: "ZEN" }, 
     "Puma Energy": { color: "#d81e05", logo: "assets/brands/puma.png", initials: "PUMA" },
     "PETROSEN": { color: "#006d8f", logo: "assets/brands/petrosen.png", initials: "PETRO" },
+    "Séné Pétrole": { color: "#008a3e", logo: "assets/brands/senepetrole.png", initials: "SP" },
     "Oryx Energies": { color: "#e36b22", logo: "assets/brands/oryx.png", initials: "ORYX" },
     "Autres (OSM)": { color: "#465a50", initials: "OSM" }
   };
