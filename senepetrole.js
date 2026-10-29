@@ -16,8 +16,8 @@ window.sunuCarbuSenePetroleStations = [
     "name": "Séné Pétrole Lac rose",
     "address": "Route de Keur Massar, Dakar",    
     "country": "Sénégal",
-    "lat": 14.799137622327015,
-    "lon": -17.255950535753744,
+    "lat": 14.798071095473217, 
+    "lon": -17.255863294921554,
     "source": "Google Maps",
     "sourceUrl": "https://maps.app.goo.gl/U4CCWih7jCG7zfmf7"
   }
