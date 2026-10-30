@@ -13,5 +13,5 @@ window.sunuCarbuOlaStations = [
   { id: "ola-keur-massar-unite-05", brand: "OLA Energy", name: "OLA Energy Keur Massar Unité 05", address: "Unité 05, Keur Massar, Dakar", phone: "", lon: -17.321565774198426, lat: 14.779108937786312, country: "Sénégal", sourceUrl: "https://www.olaenergy.com/ola-service-stations" },
   { id: "ola-thies", brand: "OLA Energy", name: "OLA Energy Thiès", address: "Centre-ville / près Stade Lat-Dior, Thiès", phone: "", lon: -16.9450, lat: 14.7820, country: "Sénégal", sourceUrl: "https://www.olaenergy.com/ola-service-stations" },
   { id: "ola-mbour-saly", brand: "OLA Energy", name: "OLA Energy Mbour Saly", address: "Entrée Saly / Gare Routière Mbour, Mbour", phone: "", lon: -16.9700, lat: 14.4150, country: "Sénégal", sourceUrl: "https://www.olaenergy.com/ola-service-stations" },
-  { id: "ola-saint-louis", brand: "OLA Energy", name: "OLA Energy Saint-Louis", address: "Square face Pont Faidherbe, Saint-Louis", phone: "", lon: -16.5050, lat: 16.0320, country: "Sénégal", sourceUrl: "https://www.olaenergy.com/ola-service-stations" }
+  { id: "ola-saint-louis", brand: "OLA Energy", name: "OLA Energy Saint-Louis", address: "Square face Pont Faidherbe, Saint-Louis", phone: "", lon: -16.487310091184714, lat: 15.997795442002122, country: "Sénégal", sourceUrl: "https://www.olaenergy.com/ola-service-stations" }
 ];
