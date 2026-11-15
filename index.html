@@ -86,6 +86,19 @@
       color: var(--muted); font-size: 0.7rem; line-height: 1.35;
       margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
     }
+    #routePanel { margin-bottom: 10px; }
+    #btnRoute {
+      width: 100%; padding: 8px 10px; border: 1px solid #111; border-radius: 9px;
+      background: #111; color: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+    }
+    #btnRoute:disabled { opacity: 0.4; cursor: not-allowed; }
+    #routeNote { margin: 5px 0; }
+    #routeChoices { display: grid; gap: 4px; }
+    .route-choice {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px;
+      background: #fff; color: var(--text); text-align: left; font-size: 0.68rem; cursor: pointer;
+    }
+    .route-choice[aria-pressed="true"] { border-color: #2563eb; background: #eff6ff; }
     #brandGrid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
       margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
@@ -216,6 +229,11 @@
     <aside>
       <input class="search" id="q" type="search" placeholder="Rechercher station, ville, marque…" autocomplete="off">
       <div id="selInfo">État non vérifié. Signalez ce que vous constatez.</div>
+      <div id="routePanel">
+        <button type="button" id="btnRoute" disabled>Calculer l’itinéraire vers cette station</button>
+        <p id="routeNote" class="note">Choisissez une station pour calculer un trajet OSM. Service public sans garantie de disponibilité; pas de trafic en temps réel.</p>
+        <div id="routeChoices" aria-live="polite"></div>
+      </div>
       <div id="brandGrid"></div>
       <div id="list"></div>
       <p id="sourceNote" class="note"></p>

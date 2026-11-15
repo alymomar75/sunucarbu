@@ -34,6 +34,10 @@ const SHARED = {
   let activeBrandFilter = "";
   let userPos = null;
   let userMarker = null;
+  let routeLayers = [];
+  let routeOptions = [];
+  let routeController = null;
+  let routeRequestId = 0;
   const group = L.layerGroup();
   const map = L.map("map", { doubleClickZoom: false, minZoom: 6 }).setView([14.5, -14.5], 7);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -158,6 +162,128 @@ const SHARED = {
     return `<span class="marker-wrap"><span class="brand" style="--c:${st.color}">${img}</span>${dot}</span>`;
   }
 
+  function clearRoute() {
+    if (routeController) routeController.abort();
+    routeController = null;
+    routeRequestId++;
+    routeLayers.forEach((layer) => map.removeLayer(layer));
+    routeLayers = [];
+    routeOptions = [];
+    const choices = $("routeChoices");
+    if (choices) choices.replaceChildren();
+    const note = $("routeNote");
+    if (note) note.textContent = userPos
+      ? "Trajet calculé depuis votre position · estimation OSM, sans trafic en temps réel."
+      : "Votre position est nécessaire pour calculer un trajet.";
+    const button = $("btnRoute");
+    if (button) button.disabled = !selected;
+  }
+
+  function formatRouteDistance(meters) {
+    return formatDistance(meters / 1000);
+  }
+
+  function selectRoute(index) {
+    routeLayers.forEach((layer, i) => layer.setStyle({
+      color: i === index ? "#2563eb" : "#94a3b8",
+      weight: i === index ? 6 : 4,
+      opacity: i === index ? 0.9 : 0.65,
+      dashArray: i === index ? null : "7 7"
+    }));
+    const choices = $("routeChoices");
+    if (!choices) return;
+    Array.from(choices.children).forEach((button, i) => {
+      button.setAttribute("aria-pressed", String(i === index));
+    });
+    const bounds = routeLayers[index].getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [28, 28], maxZoom: 14 });
+  }
+
+  function displayRoutes(routes) {
+    routeLayers.forEach((layer) => map.removeLayer(layer));
+    routeLayers = [];
+    routeOptions = routes.filter((route) =>
+      route && route.geometry && Array.isArray(route.geometry.coordinates) &&
+      route.geometry.coordinates.length > 1 &&
+      Number.isFinite(route.distance) && Number.isFinite(route.duration) &&
+      route.geometry.coordinates.every((point) =>
+        Array.isArray(point) && Number.isFinite(point[0]) && Number.isFinite(point[1])
+      )
+    );
+    if (!routeOptions.length) throw new Error("Aucun tracé routier exploitable.");
+
+    routeOptions.forEach((route, index) => {
+      const points = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+      const layer = L.polyline(points, {
+        color: index === 0 ? "#2563eb" : "#94a3b8",
+        weight: index === 0 ? 6 : 4,
+        opacity: index === 0 ? 0.9 : 0.65,
+        dashArray: index === 0 ? null : "7 7"
+      }).addTo(map);
+      layer.on("click", () => selectRoute(index));
+      routeLayers.push(layer);
+    });
+
+    const choices = $("routeChoices");
+    if (choices) {
+      choices.replaceChildren();
+      routeOptions.forEach((route, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "route-choice";
+        button.setAttribute("aria-pressed", String(index === 0));
+        button.textContent = `Option ${index + 1} · ${formatRouteDistance(route.distance)} · ${formatEta(Math.round(route.duration / 60))}`;
+        button.onclick = () => selectRoute(index);
+        choices.appendChild(button);
+      });
+    }
+
+    selectRoute(0);
+    const note = $("routeNote");
+    if (note) note.textContent = `${routeOptions.length} itinéraire(s) · estimation OSRM/OpenStreetMap (service public, disponibilité non garantie), sans données de trafic en temps réel.`;
+  }
+
+  async function calculateRoute() {
+    if (!selected || !userPos) return;
+    clearRoute();
+    const station = selected;
+    const requestId = routeRequestId;
+    const controller = new AbortController();
+    routeController = controller;
+    const button = $("btnRoute");
+    const note = $("routeNote");
+    if (button) button.disabled = true;
+    if (note) note.textContent = "Calcul de l’itinéraire…";
+
+    const url = `https://router.project-osrm.org/route/v1/driving/${userPos.lon},${userPos.lat};${station.lon},${station.lat}?alternatives=true&overview=full&geometries=geojson&steps=false`;
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) throw new Error("Service d’itinéraire indisponible.");
+      const result = await response.json();
+      if (requestId !== routeRequestId || !selected || selected.key !== station.key) return;
+      if (result.code !== "Ok" || !Array.isArray(result.routes) || !result.routes.length) {
+        throw new Error("Aucun itinéraire trouvé pour cette station.");
+      }
+      displayRoutes(result.routes);
+    } catch (error) {
+      if (requestId !== routeRequestId || error.name === "AbortError") {
+        if (error.name === "AbortError" && requestId === routeRequestId && note) {
+          note.textContent = "Le calcul a dépassé le délai. Réessayez.";
+        }
+        return;
+      }
+      if (note) note.textContent = error.message || "Impossible de calculer l’itinéraire.";
+      showNotice(error.message || "Impossible de calculer l’itinéraire.");
+    } finally {
+      clearTimeout(timeout);
+      if (requestId === routeRequestId) {
+        routeController = null;
+        if (button) button.disabled = !selected;
+      }
+    }
+  }
+
   function addMarker(s) {
     const brand = stationBrand(s);
     const status = getStatus(s.key);
@@ -199,9 +325,13 @@ const SHARED = {
   }
 
   function selectStation(s, pan) {
+    const changed = !selected || selected.key !== s.key;
+    if (changed) clearRoute();
     selected = s;
     const btnReport = $("btnReport");
     if (btnReport) btnReport.disabled = false;
+    const btnRoute = $("btnRoute");
+    if (btnRoute) btnRoute.disabled = false;
     const r = getReport(s.key);
     let info = stationLabel(s) + " · " + stationBrand(s);
     if (userPos) {
@@ -405,6 +535,24 @@ const SHARED = {
   if (qElem) qElem.addEventListener("input", applyFilters);
 
   const btnLocate = $("btnLocate");
+  function setUserPosition(lat, lon, centerMap) {
+    userPos = { lat, lon };
+    if (userMarker) {
+      userMarker.setLatLng([lat, lon]);
+    } else {
+      const blueIcon = L.divIcon({
+        className: "",
+        html: `<span style="display:block;width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 2px #2563eb,0 2px 8px rgba(0,0,0,.35)"></span>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
+      });
+      userMarker = L.marker([lat, lon], { icon: blueIcon, zIndexOffset: 1000, title: "Votre position" }).addTo(map);
+      userMarker.bindPopup("<strong>Vous êtes ici</strong>");
+    }
+    if (centerMap) map.setView([lat, lon], 14);
+    renderList();
+  }
+
   if (btnLocate) {
     btnLocate.onclick = () => {
       if (!navigator.geolocation) return showNotice("Géolocalisation indisponible");
@@ -412,27 +560,39 @@ const SHARED = {
       navigator.geolocation.getCurrentPosition((pos) => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
-        userPos = { lat, lon };
-        if (userMarker) {
-          userMarker.setLatLng([lat, lon]);
-        } else {
-          const blueIcon = L.divIcon({
-            className: "",
-            html: `<span style="display:block;width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 2px #2563eb,0 2px 8px rgba(0,0,0,.35)"></span>`,
-            iconSize: [18, 18],
-            iconAnchor: [9, 9]
-          });
-          userMarker = L.marker([lat, lon], { icon: blueIcon, zIndexOffset: 1000, title: "Votre position" }).addTo(map);
-          userMarker.bindPopup("<strong>Vous êtes ici</strong>");
-        }
-        map.setView([lat, lon], 14);
-        renderList();
+        setUserPosition(lat, lon, true);
         showNotice("Position affichée · stations triées par proximité");
       }, () => showNotice("Impossible d'obtenir votre position"), {
         enableHighAccuracy: true,
         timeout: 12000,
         maximumAge: 60000
       });
+    };
+  }
+
+  const btnRoute = $("btnRoute");
+  if (btnRoute) {
+    btnRoute.onclick = () => {
+      if (!selected) return;
+      if (userPos) {
+        calculateRoute();
+        return;
+      }
+      if (!navigator.geolocation) {
+        showNotice("La géolocalisation est nécessaire pour calculer un itinéraire.");
+        return;
+      }
+      btnRoute.disabled = true;
+      const note = $("routeNote");
+      if (note) note.textContent = "Localisation en cours…";
+      navigator.geolocation.getCurrentPosition((pos) => {
+        setUserPosition(pos.coords.latitude, pos.coords.longitude, false);
+        calculateRoute();
+      }, () => {
+        btnRoute.disabled = !selected;
+        if (note) note.textContent = "Position indisponible. Autorisez la géolocalisation puis réessayez.";
+        showNotice("Impossible d'obtenir votre position.");
+      }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
     };
   }
 
