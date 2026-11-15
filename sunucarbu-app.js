@@ -113,9 +113,18 @@ const SHARED = {
     return m ? h + " h " + m + " min" : h + " h";
   }
 
-  function isReportValid(report) {
-    if (!report || !report.timestamp) return false;
-    return (Date.now() - report.timestamp) < 48 * 3600 * 1000;
+  function isReportUsable(report) {
+    return !!report && Number.isFinite(Number(report.timestamp)) &&
+      Number(report.timestamp) > 0 &&
+      (report.availability === "shortage" || report.availability === "available");
+  }
+
+  function isReportStale(report) {
+    return Date.now() - Number(report.timestamp) >= 48 * 3600 * 1000;
+  }
+
+  function reportAgeLabel(report) {
+    return isReportStale(report) ? " · Signalement ancien (> 48 h)" : "";
   }
 
   function getLocal() {
@@ -128,7 +137,7 @@ const SHARED = {
     const shared = sharedCache[key];
     let best = null;
     for (const r of [local, shared]) {
-      if (r && isReportValid(r) && (!best || r.timestamp > best.timestamp)) best = r;
+      if (isReportUsable(r) && (!best || Number(r.timestamp) > Number(best.timestamp))) best = r;
     }
     return best;
   }
@@ -152,6 +161,7 @@ const SHARED = {
   function addMarker(s) {
     const brand = stationBrand(s);
     const status = getStatus(s.key);
+    const report = getReport(s.key);
     const m = L.marker([s.lat, s.lon], {
       icon: L.divIcon({
         className: "",
@@ -159,7 +169,7 @@ const SHARED = {
         iconSize: [30, 30],
         iconAnchor: [15, 15]
       }),
-      title: stationLabel(s) + (status === "shortage" ? " · Pénurie signalée" : status === "available" ? " · Disponible (signalé)" : " · Disponible")
+      title: stationLabel(s) + (status === "shortage" ? " · Pénurie signalée" : status === "available" ? " · Disponible (signalé)" : " · Aucun signalement récent — état non vérifié") + (report ? reportAgeLabel(report) : "")
     });
     const src = s.sourceUrl
       ? `<br><a href="${s.sourceUrl}" target="_blank" rel="noopener">Source ↗</a>`
@@ -175,6 +185,10 @@ const SHARED = {
       if (!s.marker) return;
       const brand = stationBrand(s);
       const status = getStatus(s.key);
+      const report = getReport(s.key);
+      s.marker.options.title = stationLabel(s) +
+        (status === "shortage" ? " · Pénurie signalée" : status === "available" ? " · Disponible (signalé)" : " · Aucun signalement récent — état non vérifié") +
+        (report ? reportAgeLabel(report) : "");
       s.marker.setIcon(L.divIcon({
         className: "",
         html: markHtml(brand, status),
@@ -201,6 +215,9 @@ const SHARED = {
       info += r.availability === "shortage"
         ? ` · Pénurie signalée (${t})`
         : ` · Disponible signalé (${t})`;
+      info += reportAgeLabel(r);
+    } else {
+      info += " · Aucun signalement récent — état non vérifié";
     }
     const selInfo = $("selInfo");
     if (selInfo) selInfo.textContent = info;
@@ -238,6 +255,7 @@ const SHARED = {
     }
     filtered.forEach(({ s, km }) => {
       const status = getStatus(s.key);
+      const report = getReport(s.key);
       const row = document.createElement("button");
       row.type = "button";
       row.className = "row" + (selected && selected.key === s.key ? " on" : "");
@@ -251,6 +269,8 @@ const SHARED = {
       } else {
         meta += " · Sénégal";
       }
+      if (status === null) meta += " · État non vérifié";
+      else if (report && isReportStale(report)) meta += " · Signalement ancien";
       row.innerHTML = `<strong>${dot}${stationLabel(s)}</strong><span>${meta}</span>`;
       row.onclick = () => selectStation(s, true);
       list.appendChild(row);
@@ -354,7 +374,7 @@ const SHARED = {
     const countEl = $("count");
     if (countEl) countEl.textContent = "(" + stations.length + ")";
     const note = $("sourceNote");
-    if (note) note.textContent = stations.length + " stations · par défaut disponibles · pastille rouge = pénurie signalée.";
+    if (note) note.textContent = stations.length + " stations · les pastilles gardent le dernier signalement, ancien après 48 h · sans signalement : état non vérifié.";
   }
 
   async function fetchShared() {
